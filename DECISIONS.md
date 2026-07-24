@@ -1,6 +1,6 @@
 # Decision Log
 
-Record consequential technical, process, and repository decisions here. Design decisions belong in the Design Bible.
+Record consequential technical, process, and repository decisions here. Design decisions belong in the Design Bible. Detailed architectural decisions that need durable context, alternatives, and consequences live in [docs/decisions/](docs/decisions/README.md) as ADRs.
 
 ## Template
 
