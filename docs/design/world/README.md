@@ -20,6 +20,7 @@ Document](../GAME_DESIGN_DOCUMENT.md).
 
 ## Documents
 
+- [Foundational Laws of Reality](FOUNDATIONAL_LAWS.md) — canonical laws governing reality and extraordinary phenomena.
 - [World Overview](WORLD_OVERVIEW.md) — philosophical rules of the world.
 - [History](HISTORY.md) — chronological history of the world.
 - [Cosmology](COSMOLOGY.md) — reality, creation, metaphysics, and extraordinary

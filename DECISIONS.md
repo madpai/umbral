@@ -26,3 +26,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Adopt `docs/design/DESIGN_PHILOSOPHY.md` as the immutable principles used to judge design decisions, beneath the Vision and above the Game Design Document and world documentation.
 - **Consequences:** Future design proposals must be evaluated against the philosophy. Changes to it require deliberate documentation because they affect the project’s identity.
 - **References:** [Design Philosophy](docs/design/DESIGN_PHILOSOPHY.md), [Design Bible](docs/design/README.md).
+
+## 2026-07-24 — Foundational laws of reality established
+
+- **Status:** accepted
+- **Context:** Cosmology and world lore require canonical laws governing reality before further foundations are developed.
+- **Decision:** Adopt [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md) as immutable world foundations, including Resonance, the Umbral, consequence, and the relationship between permanence and change.
+- **Consequences:** Future cosmological, historical, cultural, technological, and supernatural documents must remain compatible with these laws. Cosmology is the next major world-foundation step.
+- **References:** [World Documentation](docs/design/world/README.md), [Roadmap](ROADMAP.md).
