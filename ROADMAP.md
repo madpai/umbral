@@ -10,3 +10,8 @@
 - [x] Architecture and AI collaboration documentation scaffolded
 
 Future milestones require approved Design Bible and project-planning decisions.
+
+## Milestone 001 — World Foundation
+
+- [x] Design philosophy established
+- [ ] Begin the world’s cosmological foundation
