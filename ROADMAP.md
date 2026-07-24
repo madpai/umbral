@@ -15,4 +15,5 @@ Future milestones require approved Design Bible and project-planning decisions.
 
 - [x] Design philosophy established
 - [x] Foundational laws of reality established
+- [x] World knowledge framework established
 - [ ] Begin the world’s cosmological foundation

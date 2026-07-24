@@ -34,3 +34,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Adopt [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md) as immutable world foundations, including Resonance, the Umbral, consequence, and the relationship between permanence and change.
 - **Consequences:** Future cosmological, historical, cultural, technological, and supernatural documents must remain compatible with these laws. Cosmology is the next major world-foundation step.
 - **References:** [World Documentation](docs/design/world/README.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-24 — World knowledge framework established
+
+- **Status:** accepted
+- **Context:** UMBRAL needs a canonical account of how knowledge is discovered, preserved, distorted, forgotten, and rediscovered before cosmology is developed.
+- **Decision:** Adopt [How We Know](docs/design/world/HOW_WE_KNOW.md) as the epistemological foundation for future cultures, religions, institutions, philosophies, and scholarly traditions.
+- **Consequences:** Future world documents must treat reality as independent of belief, preserve partial and fallible perspectives, and keep cosmology as the next major world-foundation step.
+- **References:** [World Documentation](docs/design/world/README.md), [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md), [Roadmap](ROADMAP.md).
