@@ -42,3 +42,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Adopt [How We Know](docs/design/world/HOW_WE_KNOW.md) as the epistemological foundation for future cultures, religions, institutions, philosophies, and scholarly traditions.
 - **Consequences:** Future world documents must treat reality as independent of belief, preserve partial and fallible perspectives, and keep cosmology as the next major world-foundation step.
 - **References:** [World Documentation](docs/design/world/README.md), [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-24 — Resonance framework canonicalized
+
+- **Status:** accepted
+- **Context:** UMBRAL requires a formal definition of Resonance before further world foundations are developed.
+- **Decision:** Define Resonance as the universal behavior governing continuity through meaningful participation.
+- **Consequences:** Future systems, cultures, mechanics, philosophies, and historical events must remain compatible with the Resonance framework. Cosmology is the next major milestone.
+- **References:** [Resonance](docs/design/world/RESONANCE.md), [World Documentation](docs/design/world/README.md), [Roadmap](ROADMAP.md).

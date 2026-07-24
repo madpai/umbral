@@ -22,6 +22,7 @@ Document](../GAME_DESIGN_DOCUMENT.md).
 
 - [Foundational Laws of Reality](FOUNDATIONAL_LAWS.md) — canonical laws governing reality and extraordinary phenomena.
 - [How We Know](HOW_WE_KNOW.md) — how knowledge is discovered, preserved, distorted, forgotten, and rediscovered.
+- [Resonance](RESONANCE.md) — universal behavior governing continuity through meaningful participation.
 - [World Overview](WORLD_OVERVIEW.md) — philosophical rules of the world.
 - [History](HISTORY.md) — chronological history of the world.
 - [Cosmology](COSMOLOGY.md) — reality, creation, metaphysics, and extraordinary
