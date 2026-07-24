@@ -1,3 +1,5 @@
 # Design Bible
 
-This directory is reserved for approved design documentation. Add the Design Bible here before implementing gameplay or content systems.
+The Design Bible begins with [GAME_DESIGN_DOCUMENT.md](GAME_DESIGN_DOCUMENT.md).
+It records approved direction and open questions; gameplay or content systems
+must not be implemented from unapproved placeholders.
