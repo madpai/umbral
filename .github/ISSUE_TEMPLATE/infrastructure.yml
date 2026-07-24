@@ -1,0 +1,24 @@
+name: Infrastructure task
+description: Propose a repository, tooling, documentation, or automation task.
+title: "infra: "
+labels: [infrastructure]
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context and source of truth
+      description: Link the decision, milestone, or documented need.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+    validations:
+      required: true

@@ -1,0 +1,31 @@
+# Editor and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Godot generated data
+.godot/
+.import/
+
+# Build, logs, and secrets
+build/
+dist/
+logs/
+*.log
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Generated assets are not source assets
+assets/generated/
