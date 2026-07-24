@@ -2,80 +2,206 @@
 
 ## Why UMBRAL Exists
 
-UMBRAL exists to provide a long-lived, design-led world whose identity remains
-coherent as the project grows. It gives the studio a shared north star for
-evaluating future work without pre-approving mechanics, content, or technical
-solutions.
+UMBRAL exists because we believe games can be more than collections of
+content. A world should not exist only as a series of objectives waiting to be
+completed; it should exist as a place that players can inhabit.
 
-TODO: Record the approved purpose of UMBRAL in the words the studio wants to
-stand behind over the long term.
+We are not building an MMORPG.
+
+We are building a world.
+
+UMBRAL is a long-lived, design-led world where identity, history, and meaning
+are preserved as the project grows. Every system, feature, and addition must
+serve the larger purpose of making the world more coherent, more immersive,
+and more meaningful to exist within.
+
+The goal is not to maximize content.
+
+The goal is to create a place worth returning to.
+
+---
+
+## The UMBRAL Identity
+
+UMBRAL is a persistent world built around the idea that players should not
+simply consume a world — they should become part of it.
+
+The world should feel older than the individual player, continue beyond any
+single session, and develop through the accumulated presence and choices of
+those who inhabit it.
+
+Players should feel that they are entering a living place rather than loading
+a collection of disconnected experiences.
+
+UMBRAL's identity comes from the relationship between:
+
+* The world and its history
+* The player and their choices
+* The community and its shared experiences
+* Time and the consequences it creates
+
+---
 
 ## The Player Experience
 
-UMBRAL should be judged by the experience it creates for players over time,
-not by an accumulation of features. The intended player role, rhythms, and
-moments of meaning remain design decisions to be approved in the Design Bible.
+The player experience in UMBRAL should be defined by belonging, discovery,
+growth, and consequence.
 
-TODO: Define the approved player experience and enduring player fantasy.
+Players should feel that their time matters.
+
+A player's actions should contribute to a larger story, whether through
+personal achievements, relationships, exploration, creation, conflict, or
+other forms of participation.
+
+The player is not simply a hero arriving to complete a predetermined story.
+
+The player is an inhabitant of the world.
+
+The world should provide opportunities for players to create their own stories
+while still maintaining a strong identity and purpose.
+
+TODO: Continue refining the exact player fantasy and emotional journey.
+
+---
 
 ## Long-Term World Philosophy
 
-The world should have a durable internal identity. Its growth should respect
-established context, make change understandable, and leave room for future
-stories without treating the world as disposable.
+UMBRAL's world must have continuity.
 
-TODO: Define the approved philosophy for world change, continuity, and
-stewardship.
+New additions should feel like they belong. The past should remain meaningful.
+The future should emerge naturally from established foundations.
+
+The world should not be disposable.
+
+It should not reset simply because a new chapter begins.
+
+It should not abandon its history to chase temporary trends.
+
+Every major change should respect what came before and create possibilities
+for what comes next.
+
+The world is not a backdrop for the game.
+
+The world is the game.
+
+---
 
 ## The Persistent World Promise
 
-UMBRAL's promise of persistence must be clear, meaningful, and supportable.
-What persists, for whom, for how long, and how players encounter that
-persistence require explicit design and technical decisions.
+Persistence is not a feature label. It is a responsibility.
 
-TODO: Define the approved persistence promise and its player-facing
-boundaries.
+UMBRAL promises to treat the world as something worth preserving.
+
+Persistence means more than keeping data between sessions. It means creating
+a sense that actions, decisions, and time have meaning within a continuous
+place.
+
+The exact boundaries of persistence must be carefully designed and supported
+technically.
+
+Important questions remain:
+
+* What aspects of the world persist?
+* What can players permanently influence?
+* What changes naturally over time?
+* What must remain stable to preserve identity?
+
+These decisions must be made deliberately.
+
+---
 
 ## What Makes UMBRAL Different
 
-UMBRAL should be distinguished by a coherent relationship among its world,
-its players, and the consequences of their presence—not by copying a list of
-genre conventions.
+UMBRAL is not defined by the number of systems it contains.
 
-TODO: Describe the approved differentiators once they are recorded in the
-Design Bible.
+It is defined by the relationship between systems.
+
+A feature belongs in UMBRAL only if it strengthens the connection between
+players and the world.
+
+The goal is not to create the largest world.
+
+The goal is to create a world with the strongest sense of presence.
+
+UMBRAL should feel like a place where:
+
+* history matters
+* choices have weight
+* communities can form identities
+* exploration creates understanding
+* time creates meaning
+
+---
 
 ## Core Emotional Goals
 
-The project should aim for emotional resonance, a sense of belonging in a
-world with continuity, and the feeling that time and attention matter.
+UMBRAL should create feelings of:
 
-TODO: Define the approved emotional goals, their priority, and how they will
-be evaluated.
+### Belonging
+
+Players should feel that they have a place within the world.
+
+### Discovery
+
+The world should reward curiosity and encourage players to understand it.
+
+### Significance
+
+Players should feel that their actions contribute to something larger than
+themselves.
+
+### Continuity
+
+Players should feel connected to a world that existed before them and will
+continue after them.
+
+### Wonder
+
+The world should encourage the feeling that there is always something more
+to discover.
+
+---
 
 ## Design Principles
 
-- Preserve coherence between new work and the established world.
-- Prefer deliberate, durable direction over feature accumulation.
-- Treat persistence as a player-facing responsibility, not a marketing claim.
-- Make consequential decisions explicit and reviewable.
-- Leave unapproved gameplay and content choices open until the Design Bible
-  records them.
+* We are not building an MMORPG. We are building a world.
+* Every feature must make the world better, or it does not belong.
+* Preserve coherence between new work and established identity.
+* Prefer meaningful depth over unnecessary breadth.
+* Treat persistence as a responsibility, not a marketing term.
+* Make major decisions explicit and reviewable.
+* Protect the long-term vision from short-term trends.
+* Build systems that support player stories rather than replacing them.
+
+---
 
 ## Things UMBRAL Will Avoid
 
-UMBRAL will avoid allowing implementation convenience, unreviewed trends, or
-unexamined feature requests to define its identity. It will not treat this
-vision as approval for specific mechanics, content, technology, or scope.
+UMBRAL will avoid becoming a collection of disconnected features.
 
-TODO: Add approved non-goals as the project establishes them.
+It will avoid:
+
+* adding mechanics only because they are popular elsewhere
+* sacrificing world identity for temporary engagement
+* treating players as consumers instead of inhabitants
+* creating content that does not strengthen the world
+* allowing technical convenience alone to define design
+
+UMBRAL will not chase scale for its own sake.
+
+A smaller meaningful world is preferable to a larger empty one.
+
+---
 
 ## Future Vision
 
-This document is a durable guide, not a substitute for the Game Design
-Document, architecture documentation, or decision records. It should be
-revisited as UMBRAL gains approved direction while preserving a clear account
-of how its long-term identity evolves.
+UMBRAL is intended to grow carefully over time.
 
-TODO: Define review cadence, ownership, and the conditions that warrant a
-vision update.
+Its foundation must be strong enough to support years of development,
+expansion, and discovery without losing its identity.
+
+The project will evolve, but its purpose should remain consistent:
+
+Create a world worth inhabiting.
+
+Every future decision should be measured against that goal.
