@@ -29,6 +29,8 @@ Document](../GAME_DESIGN_DOCUMENT.md).
   of reality.
 - [Participation](PARTICIPATION.md) — how relationships produce continuity,
   autonomy, reflection, collectives, and emergence.
+- [The First Valley Initiative](FIRST_VALLEY.md) — controlled worldbuilding
+  derivation and validation record for the first practical place.
 - [Factions](FACTIONS.md) — political organizations, powers, alliances, and
   rivalries.
 - [Cultures](CULTURES.md) — civilizations, traditions, customs, and identities.

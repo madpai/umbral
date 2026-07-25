@@ -74,3 +74,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Adopt [CANON](docs/CANON.md) as the constitutional document governing how UMBRAL truth is derived, recorded, challenged, and carried into future work. Contributions must derive before inventing, preserve continuity and consequence, and resolve contradictions before implementation.
 - **Consequences:** The Canon Keeper must identify terminology drift and contradictions. Implementation agents may translate approved canon but may not alter foundational truth through convenience. Future foundational work alternates with practical worldbuilding during the Validation Phase.
 - **References:** [CANON](docs/CANON.md), [Design Philosophy](docs/design/DESIGN_PHILOSOPHY.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — First Valley validation initiated
+
+- **Status:** accepted
+- **Context:** The First Principles Sprint requires practical validation before further foundational philosophy expands the repository.
+- **Decision:** Begin the First Valley Initiative as a controlled derivation and validation record. Its geographic and settlement statements remain hypotheses until physical constraints and their consequences are established.
+- **Consequences:** The initiative tests whether UMBRAL's first principles produce a coherent place without feature-first invention. The next gate is geology, watershed, climate, seasons, soil, and natural hazards; settlement history, species, cultures, inhabitants, quests, and magic remain unfinalized.
+- **References:** [The First Valley Initiative](docs/design/world/FIRST_VALLEY.md), [CANON](docs/CANON.md), [Roadmap](ROADMAP.md).

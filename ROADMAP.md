@@ -41,3 +41,8 @@ Planned sequence:
 - [ ] LIFE.md — life and autonomous continuity
 - [ ] CONSCIOUSNESS.md — reflective participation and lived experience
 - [ ] First Valley Initiative — practical worldbuilding validation
+
+### First Valley Initiative — active
+
+- Current stage: derivation framework and initial hypotheses
+- Next gate: establish physical constraints before expanding settlement history
