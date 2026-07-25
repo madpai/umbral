@@ -1,0 +1,65 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.847059, 0.827451, 0.780392, 1)
+roughness = 0.9
+
+[sub_resource type="BoxMesh" id="BoxMesh_nose"]
+size = Vector3(0.16, 0.16, 0.55)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nose"]
+albedo_color = Color(0.95, 0.407843, 0.121569, 1)
+roughness = 0.6
+
+[sub_resource type="BoxMesh" id="BoxMesh_shoulder"]
+size = Vector3(0.9, 0.12, 0.12)
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_player")
+
+[node name="Collision" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Body" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+
+[node name="Capsule" type="MeshInstance3D" parent="Body"]
+mesh = SubResource("CapsuleMesh_body")
+surface_material_override/0 = SubResource("StandardMaterial3D_body")
+
+[node name="Nose" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.35, -0.44)
+mesh = SubResource("BoxMesh_nose")
+surface_material_override/0 = SubResource("StandardMaterial3D_nose")
+
+[node name="Shoulders" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("BoxMesh_shoulder")
+surface_material_override/0 = SubResource("StandardMaterial3D_nose")
+
+[node name="CameraRig" type="Node3D" parent="."]
+top_level = true
+
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraRig"]
+spring_length = 5.0
+margin = 0.3
+
+[node name="Camera3D" type="Camera3D" parent="CameraRig/SpringArm3D"]
+fov = 75.0
+near = 0.1
+far = 500.0
+
+[node name="GroundCheck" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+target_position = Vector3(0, -2, 0)

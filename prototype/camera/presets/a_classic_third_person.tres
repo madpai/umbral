@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CameraPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://camera/camera_preset.gd" id="1_p"]
+
+[resource]
+script = ExtResource("1_p")
+preset_name = "A · Classic Third Person"
+distance = 5.0
+height = 1.5
+shoulder_offset = 0.0
+pitch_degrees = -14.0
+pitch_min_degrees = -68.0
+pitch_max_degrees = 32.0
+fov = 75.0
+fov_sprint_add = 9.0
+damping = 14.0
+avoid_obstructions = true

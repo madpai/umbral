@@ -107,9 +107,57 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Roughly forty percent of the week is allocated to movement and camera tuning before any content exists. No gameplay system, geography, name, or production architecture is decided. Prototype code is expected to be deleted; its deliverable is tuned values, playtest recordings, and a written verdict against recorded kill criteria. Client-authoritative feel may not survive later server authority; this is knowingly deferred.
 - **References:** [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [ADR-001](docs/decisions/ADR-001-prototype-engine.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md), [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md).
 
+## 2026-07-25 — Godot 4.x accepted as prototype engine
+
+- **Status:** accepted (supersedes the proposal below)
+- **Context:** The project owner approved Godot 4.7.1 for Feel Prototype 01.
+- **Decision:** [ADR-001](docs/decisions/ADR-001-prototype-engine.md) moves to Accepted, bounded to the disposable prototype. Production engine selection remains open.
+- **Consequences:** Prototype implementation may proceed at `prototype/`. `TODO.md` item 3 remains open because it requires engine, server, package-management, formatting, and release decisions; only a prototype-scoped engine decision is now recorded. `game/`, `server/`, and `shared/` remain empty and unclaimed. Gameplay-related proposed decisions remain proposed and are unaffected.
+- **References:** [ADR-001](docs/decisions/ADR-001-prototype-engine.md), [TODO](TODO.md).
+
+## 2026-07-25 — Feel Prototype 01 Phase 0 and Phase 1 implemented
+
+- **Status:** accepted
+- **Context:** The implementation plan gates all later phases behind a movement and camera laboratory that must feel good before any content is built.
+- **Decision:** Implement Phase 0 (setup) and Phase 1 (feel) only, at `prototype/`. No interaction, carry, hazard, path wear, or feedback layer. No autoload, no event bus, no component framework, no plugins. All movement and camera values are exported and re-read every frame so they can be tuned in the Inspector while running.
+- **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
+- **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
+
+## 2026-07-25 — Provisional movement and camera direction
+
+- **Status:** accepted as **provisional prototype direction**; explicitly **not** production canon
+- **Context:** The Phase 1.3 owner playtest found the Hybrid World framing substantially closer to the intended UMBRAL experience than any fixed preset. A closer minimum zoom was requested before checkpointing.
+- **Decision:** Adopt, for continued prototyping only: Hybrid World as the camera direction; click-to-walk as the primary movement direction; mouse-wheel zoom and right-mouse-drag orbit as part of that direction. Move the Hybrid World minimum zoom from 9.0 m to 7.5 m, re-solving the zoom curve endpoints (`pitch_at_min_zoom` −27.0° → −23.9°, `fov_at_min_zoom` 62.0° → 63.6°) so the approved 13.0 m default framing stays at exactly −35.4° / 57.6°.
+- **Consequences:** This direction remains subject to later playtesting and may still be revised or dropped; it establishes no production canon and no gameplay decision. The new close bound is 7.50 m at 23.9° elevation with the character at 16.7% of screen height — closer than B · Adventure (8.50 m, 24.0°, 14.8%) at essentially the same angle, and clearly distinct from A · Classic Third Person (5.00 m, 14.0°, 21.1%). Maximum distance, coupled pitch/FOV behaviour, orbit controls, pitch limits, movement tuning and step-up are unchanged and were re-measured as identical. Sprint behaviour, jumping, automated or path-driven traversal, touch gestures, and pathfinding all remain unresolved and unbuilt. WASD remains a debug comparison mode only; presets A, B and C are retained unchanged for re-anchoring.
+- **References:** `prototype/CAMERA_TEST.md`, `prototype/TUNING.md`, [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md).
+
+## 2026-07-25 — Hybrid World orbit and zoom camera (Phase 1.3)
+
+- **Status:** accepted (engineering); the perspective remains **unresolved design**
+- **Context:** The Phase 1.2 camera test found preset A too close and avatar-focused for click-to-move, and both B and C promising, with C somewhat too distant as a fixed default. The owner located the strongest direction between B and C and asked whether a freely adjustable elevated camera bounded by those two makes click-to-move feel natural.
+- **Decision:** Add a fourth preset, `H · Hybrid World`, as the launch default: 13.0 m at −35.4° and 57.6° FOV, wheel-zoomable between 9.0 m and 20.0 m with pitch and FOV coupled to the zoom position, right-drag orbit, and arrow-key orbit as a fallback. A, B and C are retained unchanged for comparison. Pitch is applied as a moving baseline so zooming preserves rather than overwrites a manual orbit; the pitch ceiling of −18° prevents zooming into an over-the-shoulder view.
+- **Consequences:** No perspective is recorded as canon; the hybrid is an experiment awaiting owner playtest via `prototype/CAMERA_TEST.md`. Destination-click accuracy was verified by round trip at six camera extremes with 0.0000 m error, and movement, stopping, stairs, slopes, jumping, step-up and physics interpolation were re-measured as identical. Preset H disables spring-arm obstruction avoidance for the same reason C does. Sprint and jump remain unchanged despite owner doubts about their fit; those are recorded as open design questions only. Pathfinding, navigation, orthographic projection and gameplay remain deliberately unbuilt.
+- **References:** `prototype/CAMERA_TEST.md`, `prototype/TUNING.md`, [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md).
+
+## 2026-07-25 — Camera & Perspective Laboratory (Phase 1.2)
+
+- **Status:** accepted (engineering); the perspective itself remains **unresolved design**
+- **Context:** After the Phase 1.1 playtest the highest-priority design question became "from what perspective should the player experience UMBRAL?" rather than "does click-to-move work?". Movement was judged validated enough to continue; the camera was not.
+- **Decision:** Move all camera framing, pitch, lens and response values out of `player.gd` into `CameraPreset` resources, and add three switchable presets — A Classic Third Person (control group), B Adventure, C High Strategy — cycled with F3. One rig, one camera, one controller; only the data changes. Input rates (`mouse_sensitivity`, `gamepad_look_speed`, `invert_pitch`, `fov_lerp_speed`) stay on the player so they are held constant across the comparison.
+- **Consequences:** No perspective is recorded as canon; the experiment is decided by owner playtest using `prototype/CAMERA_TEST.md`. Movement, click-to-move, step-up, jumping and physics were re-measured after the change and are identical on every metric. Three preset choices are deliberate biases documented for the owner to discount: preset C disables spring-arm obstruction avoidance, presets B and C clamp pitch so they cannot be levelled into third person, and sprint FOV punch is reduced or removed at distance. No camera shake, cinematic effects, bloom, depth of field, motion blur or screen effects were added.
+- **References:** `prototype/CAMERA_TEST.md`, `prototype/TUNING.md`, [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md).
+
+## 2026-07-25 — Feel Prototype 01 Phase 1.1 corrections and control-model experiment
+
+- **Status:** accepted (engineering); the control model itself remains **unresolved design**
+- **Context:** The owner played Phase 1 and passed it provisionally, reporting visible character shakiness and a staircase that could not be walked up. Separately, the current design direction is that click or tap should express destination and interaction intent rather than continuous WASD locomotion.
+- **Decision:** (1) Enable `physics/common/physics_interpolation`; the shakiness was a render/physics rate mismatch, measured at 59% duplicate render frames, not a camera fault. (2) Add a ~30-line step-up local to `player.gd` with a configurable `max_step_height`, default 0.25 m. (3) Add a click-to-move experiment using a direct ground target — no navigation mesh, no agent, no pathfinding — with WASD retained behind an F2 toggle as the comparison baseline.
+- **Consequences:** Neither WASD nor click-to-move is recorded as UMBRAL canon; click-to-move is the leading direction under test and requires an owner playtest before any further work. Click-to-move has no obstacle avoidance and walks into pillars; `NavigationAgent3D` is the obvious next step only if the direction is adopted. Step-up rejects a step with an obstruction within ~0.45 m behind it, because the clearance probe must exceed the capsule radius to avoid catching a step's leading corner. Phase 2 remains gated.
+- **References:** `prototype/TUNING.md`, [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md).
+
 ## 2026-07-25 — Godot 4.x proposed as prototype engine
 
-- **Status:** proposed
+- **Status:** superseded by the accepted entry above
 - **Context:** No engine decision is recorded and `TODO.md` lists it as open. The project owner directed that the prototype be designed around Godot 4.x without engine comparison.
 - **Decision:** Record the owner's direction as [ADR-001](docs/decisions/ADR-001-prototype-engine.md), scoped to Feel Prototype 01 only. Production engine selection remains open.
 - **Consequences:** Prototype work may begin against Godot 4.7.1. `game/`, `server/`, and `shared/` remain empty and unclaimed. `TODO.md` item 3 remains open; production confirmation requires recorded persistence, networking, authority, and platform requirements in a separate ADR.

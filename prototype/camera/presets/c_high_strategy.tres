@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CameraPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://camera/camera_preset.gd" id="1_p"]
+
+[resource]
+script = ExtResource("1_p")
+preset_name = "C · High Strategy"
+distance = 20.0
+height = 2.5
+shoulder_offset = 0.0
+pitch_degrees = -50.0
+pitch_min_degrees = -72.0
+pitch_max_degrees = -30.0
+fov = 48.0
+fov_sprint_add = 0.0
+damping = 7.0
+avoid_obstructions = false

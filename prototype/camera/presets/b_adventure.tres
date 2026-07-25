@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CameraPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://camera/camera_preset.gd" id="1_p"]
+
+[resource]
+script = ExtResource("1_p")
+preset_name = "B · Adventure"
+distance = 8.5
+height = 2.1
+shoulder_offset = 0.0
+pitch_degrees = -24.0
+pitch_min_degrees = -70.0
+pitch_max_degrees = 18.0
+fov = 65.0
+fov_sprint_add = 6.0
+damping = 10.0
+avoid_obstructions = true

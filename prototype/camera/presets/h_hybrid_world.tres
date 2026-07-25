@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="CameraPreset" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://camera/camera_preset.gd" id="1_p"]
+
+[resource]
+script = ExtResource("1_p")
+preset_name = "H · Hybrid World"
+distance = 13.0
+height = 2.3
+shoulder_offset = 0.0
+pitch_degrees = -35.4
+pitch_min_degrees = -70.0
+pitch_max_degrees = -18.0
+fov = 57.6
+fov_sprint_add = 4.0
+damping = 9.0
+zoom_enabled = true
+zoom_min_distance = 7.5
+zoom_max_distance = 20.0
+zoom_step = 0.08
+zoom_response = 9.0
+pitch_at_min_zoom = -23.9
+pitch_at_max_zoom = -50.0
+fov_at_min_zoom = 63.6
+fov_at_max_zoom = 50.0
+avoid_obstructions = false

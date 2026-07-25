@@ -2,14 +2,16 @@
 
 ## Status
 
-Proposed — pending project-owner approval.
+Accepted — 2026-07-25, by the project owner, **for Feel Prototype 01 only.**
 
 This ADR scopes **the prototype only.** Production engine selection remains
 open ([TODO.md](../../TODO.md), [CLIENT.md](../architecture/CLIENT.md)).
+Acceptance authorises a disposable prototype and nothing further; it is not a
+production-engine commitment and must not be cited as one.
 
 ## Date
 
-2026-07-25
+Proposed 2026-07-25. Accepted 2026-07-25.
 
 ## Context
 
@@ -84,4 +86,9 @@ at minimum: recorded persistent-world requirements
 ([SERVER.md](../architecture/SERVER.md)), and a target-platform decision. Those
 belong in a separate ADR that may confirm, extend, or supersede this one.
 
-Recording this ADR does not close [TODO.md](../../TODO.md) item 3.
+Accepting this ADR does **not** close [TODO.md](../../TODO.md) item 3. That item
+requires recording "engine, server, package-management, formatting, and release
+decisions." This ADR records one engine decision, and only for a disposable
+prototype. The production engine, server technology, package management,
+formatting standard, and release process all remain unrecorded, so item 3 stays
+open.
