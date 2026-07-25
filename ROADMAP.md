@@ -18,6 +18,13 @@ Future milestones require approved Design Bible and project-planning decisions.
 - [x] World knowledge framework established
 - [x] Resonance formally defined
 - [x] Canonical cosmology established
+
+**Phase I — Foundational Reality:** complete
+
+**Phase II — Living Systems:** initiated
+
+- [x] Canonical participation framework established
+- Current document: `PARTICIPATION.md`
 - [ ] LIFE.md — life and autonomous continuity
-- [ ] INVARIANTS.md — constraints that persist across change
-- [ ] CANON.md — canon authority and consistency
+- [ ] CONSCIOUSNESS.md — reflective participation and lived experience
+- [ ] EMERGENCE.md — higher-order continuity and capability

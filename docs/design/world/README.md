@@ -27,6 +27,8 @@ Document](../GAME_DESIGN_DOCUMENT.md).
 - [History](HISTORY.md) — chronological history of the world.
 - [Cosmology](COSMOLOGY.md) — the objective structure and inseparable aspects
   of reality.
+- [Participation](PARTICIPATION.md) — how relationships produce continuity,
+  autonomy, reflection, collectives, and emergence.
 - [Factions](FACTIONS.md) — political organizations, powers, alliances, and
   rivalries.
 - [Cultures](CULTURES.md) — civilizations, traditions, customs, and identities.

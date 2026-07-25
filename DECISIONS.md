@@ -58,3 +58,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Reality is participatory: to exist is to participate, participation transforms relationships, identity emerges from continuity, consciousness emerges from integrated life, and death ends autonomous participation but not consequence.
 - **Consequences:** Manifest and Umbral are inseparable aspects of one reality rather than separate realms. Future world documents must derive life, identity, consciousness, death, and time from participation and continuity without introducing creators, souls, afterlives, or arbitrary exceptions.
 - **References:** [Cosmology](docs/design/world/COSMOLOGY.md), [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md), [Resonance](docs/design/world/RESONANCE.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — Participation framework canonicalized
+
+- **Status:** accepted
+- **Context:** Cosmology establishes participation as fundamental, but the progression from existence to life, reflection, collective continuity, and emergence requires a precise intermediate framework.
+- **Decision:** Define a participant as an enduring entity whose existence necessarily enters relationships with reality. Distinguish passive, autonomous, reflective, and collective participation without treating any mode as separate from reality or assuming that collective continuity is a unified consciousness.
+- **Consequences:** Relationships create continuity, continuity allows identity, and organized participation can produce emergent capabilities. Cooperation and competition are structural outcomes rather than moral categories. Life, consciousness, and emergence must be derived from this framework.
+- **References:** [Participation](docs/design/world/PARTICIPATION.md), [Cosmology](docs/design/world/COSMOLOGY.md), [Resonance](docs/design/world/RESONANCE.md), [Roadmap](ROADMAP.md).

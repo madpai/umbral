@@ -227,7 +227,8 @@ The recommended order for foundational world documents is:
 1. FOUNDATIONAL_LAWS.md
 2. HOW_WE_KNOW.md
 3. COSMOLOGY.md
-4. HISTORY.md
-5. CULTURES.md
-6. FACTIONS.md
-7. LOCATIONS.md
+4. PARTICIPATION.md
+5. HISTORY.md
+6. CULTURES.md
+7. FACTIONS.md
+8. LOCATIONS.md
