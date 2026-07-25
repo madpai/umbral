@@ -17,4 +17,7 @@ Future milestones require approved Design Bible and project-planning decisions.
 - [x] Foundational laws of reality established
 - [x] World knowledge framework established
 - [x] Resonance formally defined
-- [ ] COSMOLOGY.md — next major milestone
+- [x] Canonical cosmology established
+- [ ] LIFE.md — life and autonomous continuity
+- [ ] INVARIANTS.md — constraints that persist across change
+- [ ] CANON.md — canon authority and consistency

@@ -50,3 +50,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Define Resonance as the universal behavior governing continuity through meaningful participation.
 - **Consequences:** Future systems, cultures, mechanics, philosophies, and historical events must remain compatible with the Resonance framework. Cosmology is the next major milestone.
 - **References:** [Resonance](docs/design/world/RESONANCE.md), [World Documentation](docs/design/world/README.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — Canonical cosmology established
+
+- **Status:** accepted
+- **Context:** UMBRAL requires an objective account of reality from which future world foundations can be derived.
+- **Decision:** Reality is participatory: to exist is to participate, participation transforms relationships, identity emerges from continuity, consciousness emerges from integrated life, and death ends autonomous participation but not consequence.
+- **Consequences:** Manifest and Umbral are inseparable aspects of one reality rather than separate realms. Future world documents must derive life, identity, consciousness, death, and time from participation and continuity without introducing creators, souls, afterlives, or arbitrary exceptions.
+- **References:** [Cosmology](docs/design/world/COSMOLOGY.md), [Foundational Laws of Reality](docs/design/world/FOUNDATIONAL_LAWS.md), [Resonance](docs/design/world/RESONANCE.md), [Roadmap](ROADMAP.md).

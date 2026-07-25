@@ -25,8 +25,8 @@ Document](../GAME_DESIGN_DOCUMENT.md).
 - [Resonance](RESONANCE.md) — universal behavior governing continuity through meaningful participation.
 - [World Overview](WORLD_OVERVIEW.md) — philosophical rules of the world.
 - [History](HISTORY.md) — chronological history of the world.
-- [Cosmology](COSMOLOGY.md) — reality, creation, metaphysics, and extraordinary
-  forces.
+- [Cosmology](COSMOLOGY.md) — the objective structure and inseparable aspects
+  of reality.
 - [Factions](FACTIONS.md) — political organizations, powers, alliances, and
   rivalries.
 - [Cultures](CULTURES.md) — civilizations, traditions, customs, and identities.
