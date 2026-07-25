@@ -51,3 +51,8 @@ Planned sequence:
   complete game loop.
 - Next gate: establish physical constraints before expanding settlement history
   and select the smallest playable experience segment for validation.
+- Technical plan for the micro-slice proposed:
+  [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md) and
+  [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md). The plan uses
+  neutral placeholders for the unresolved first-hour decisions and does not
+  consume the physical-constraints gate.

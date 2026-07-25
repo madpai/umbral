@@ -90,3 +90,27 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Treat dialogue and authored story as optional engagement layers. Every major design receives both a coherence test and a gameplay test. Begin paper vertical-slice design for the first hour.
 - **Consequences:** Gameplay must remain satisfying when narrative content is skipped. Validation alternates with world derivation, beginning with a 10–15 minute playable micro-slice; no first-hour sequence is finalized by the framework.
 - **References:** [Design Philosophy](docs/design/DESIGN_PHILOSOPHY.md), [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md), [First Valley Initiative](docs/design/world/FIRST_VALLEY.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — Technical planning directory established
+
+- **Status:** accepted
+- **Context:** The micro-slice requires engine-specific implementation planning, but `docs/architecture/` is declared technology-neutral and records approved system boundaries rather than deliverable-scoped plans.
+- **Decision:** Add `docs/technical/` for engine-specific, deliverable-scoped implementation planning. Documents there make no design decisions and must name a neutral placeholder, with its corresponding open decision, wherever a plan would otherwise require one.
+- **Consequences:** `docs/architecture/` remains technology-neutral. Technical planning documents may be superseded or deleted when their deliverable completes, without affecting approved architecture. Placeholders recorded in technical planning do not become design precedent.
+- **References:** [Technical Planning](docs/technical/README.md), [Architecture Documentation](docs/architecture/README.md), [CANON](docs/CANON.md).
+
+## 2026-07-25 — Feel Prototype 01 scope proposed
+
+- **Status:** proposed
+- **Context:** The First Valley Initiative requires a 10–15 minute playable micro-slice to test mechanical quality before further design work proceeds. Every first-hour beat remains unresolved, so a prototype must be scoped without inventing gameplay direction.
+- **Decision:** Propose a one-week, single-player, single-map throwaway prototype answering one question: is UMBRAL enjoyable to control and interact with? It implements movement, camera, one repeatable interaction verb, carry, one environmental hazard, one persistent visible consequence, and a feedback layer. The interaction verb, carry, and hazard are neutral placeholders mapped to unresolved first-hour decisions. Persistent path wear from repeated traversal is derived from established canon rather than invented.
+- **Consequences:** Roughly forty percent of the week is allocated to movement and camera tuning before any content exists. No gameplay system, geography, name, or production architecture is decided. Prototype code is expected to be deleted; its deliverable is tuned values, playtest recordings, and a written verdict against recorded kill criteria. Client-authoritative feel may not survive later server authority; this is knowingly deferred.
+- **References:** [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [ADR-001](docs/decisions/ADR-001-prototype-engine.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md), [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md).
+
+## 2026-07-25 — Godot 4.x proposed as prototype engine
+
+- **Status:** proposed
+- **Context:** No engine decision is recorded and `TODO.md` lists it as open. The project owner directed that the prototype be designed around Godot 4.x without engine comparison.
+- **Decision:** Record the owner's direction as [ADR-001](docs/decisions/ADR-001-prototype-engine.md), scoped to Feel Prototype 01 only. Production engine selection remains open.
+- **Consequences:** Prototype work may begin against Godot 4.7.1. `game/`, `server/`, and `shared/` remain empty and unclaimed. `TODO.md` item 3 remains open; production confirmation requires recorded persistence, networking, authority, and platform requirements in a separate ADR.
+- **References:** [ADR-001](docs/decisions/ADR-001-prototype-engine.md), [Client Architecture](docs/architecture/CLIENT.md), [TODO](TODO.md).
