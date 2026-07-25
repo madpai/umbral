@@ -66,3 +66,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Define a participant as an enduring entity whose existence necessarily enters relationships with reality. Distinguish passive, autonomous, reflective, and collective participation without treating any mode as separate from reality or assuming that collective continuity is a unified consciousness.
 - **Consequences:** Relationships create continuity, continuity allows identity, and organized participation can produce emergent capabilities. Cooperation and competition are structural outcomes rather than moral categories. Life, consciousness, and emergence must be derived from this framework.
 - **References:** [Participation](docs/design/world/PARTICIPATION.md), [Cosmology](docs/design/world/COSMOLOGY.md), [Resonance](docs/design/world/RESONANCE.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — Constitutional canon established
+
+- **Status:** accepted
+- **Context:** The repository requires a durable process for preserving coherence as foundational truth becomes design, implementation, and practical worldbuilding.
+- **Decision:** Adopt [CANON](docs/CANON.md) as the constitutional document governing how UMBRAL truth is derived, recorded, challenged, and carried into future work. Contributions must derive before inventing, preserve continuity and consequence, and resolve contradictions before implementation.
+- **Consequences:** The Canon Keeper must identify terminology drift and contradictions. Implementation agents may translate approved canon but may not alter foundational truth through convenience. Future foundational work alternates with practical worldbuilding during the Validation Phase.
+- **References:** [CANON](docs/CANON.md), [Design Philosophy](docs/design/DESIGN_PHILOSOPHY.md), [Roadmap](ROADMAP.md).

@@ -68,7 +68,7 @@ It is the foundation from which all extraordinary phenomena must ultimately emer
 
 ---
 
-# The Three Laws of Resonance
+# Foundational Behaviors of Resonance
 
 ## First Law
 

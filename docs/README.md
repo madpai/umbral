@@ -1,5 +1,7 @@
 # Documentation Guide
 
+- [CANON](CANON.md) — the constitutional process for discovering, recording,
+  and evaluating UMBRAL's truth.
 - `00_STUDIO_CHARTER.md` — project purpose and operating principles.
 - `design/` — approved Design Bible material, including `GAME_DESIGN_DOCUMENT.md` and [UMBRAL Vision](design/UMBRAL_VISION.md).
 - `architecture/` — technology-neutral architecture planning and approved system boundaries.

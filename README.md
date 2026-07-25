@@ -20,4 +20,4 @@ python3 tools/umbral.py check
 - `tools/` and `scripts/` — versioned developer tooling.
 - `prompts/` — reviewed AI workflow templates.
 
-Read [the Studio Charter](docs/00_STUDIO_CHARTER.md), the [UMBRAL Vision](docs/design/UMBRAL_VISION.md), the [world documentation](docs/design/world/README.md), and [CONTRIBUTING.md](CONTRIBUTING.md) before contributing. Major technical and governance choices use the [ADR framework](docs/decisions/README.md).
+Read [CANON](docs/CANON.md) first, followed by [the Studio Charter](docs/00_STUDIO_CHARTER.md), the [UMBRAL Vision](docs/design/UMBRAL_VISION.md), the [world documentation](docs/design/world/README.md), and [CONTRIBUTING.md](CONTRIBUTING.md) before contributing. Major technical and governance choices use the [ADR framework](docs/decisions/README.md).

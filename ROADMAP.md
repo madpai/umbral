@@ -11,7 +11,7 @@
 
 Future milestones require approved Design Bible and project-planning decisions.
 
-## Milestone 001 — World Foundation
+## First Principles Sprint — complete
 
 - [x] Design philosophy established
 - [x] Foundational laws of reality established
@@ -28,3 +28,16 @@ Future milestones require approved Design Bible and project-planning decisions.
 - [ ] LIFE.md — life and autonomous continuity
 - [ ] CONSCIOUSNESS.md — reflective participation and lived experience
 - [ ] EMERGENCE.md — higher-order continuity and capability
+
+## Validation Phase
+
+The First Principles Sprint is complete. Future foundational work should now
+alternate with practical worldbuilding rather than expanding philosophy
+indefinitely.
+
+Planned sequence:
+
+- [x] CANON.md — constitutional canon
+- [ ] LIFE.md — life and autonomous continuity
+- [ ] CONSCIOUSNESS.md — reflective participation and lived experience
+- [ ] First Valley Initiative — practical worldbuilding validation

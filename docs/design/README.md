@@ -11,7 +11,8 @@ The documents establish a hierarchy: the Vision explains why UMBRAL exists;
 the Design Philosophy defines the principles that govern decisions; the Game
 Design Document describes how those principles shape the game; and
 [world documentation](world/README.md) describes the universe that emerges
-from those foundations.
+from those foundations. All of these documents remain subject to the repository
+constitution in [CANON](../CANON.md).
 
 The Design Bible records approved direction and open questions; gameplay or
 content systems must not be implemented from unapproved placeholders.
