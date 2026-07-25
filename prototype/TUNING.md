@@ -1,8 +1,9 @@
 # Feel Prototype 01 — Tuning Log
 
 Phase 1 (movement and camera), Phase 1.1 (jitter correction, step-up,
-click-to-move experiment), Phase 1.2 (camera & perspective laboratory) and
-Phase 1.3 (Hybrid World orbit + zoom camera). This file is the actual research output of the
+click-to-move experiment), Phase 1.2 (camera & perspective laboratory),
+Phase 1.3 (Hybrid World orbit + zoom camera) and Phase 1.4 (navigation
+experiment — see `NAVIGATION_TEST.md`). This file is the actual research output of the
 prototype. The code is disposable; these numbers are not.
 
 Phase 1 has been played by the owner and passed provisionally. **Nothing in the
@@ -445,50 +446,144 @@ and click-to-move arrival are all identical to Phase 1.2 values.
 
 ---
 
+## Phase 1.4 — 2026-07-25 (navigation experiment)
+
+Built on top of the provisional direction without altering it. Movement,
+step-up, camera, zoom and orbit are untouched and were re-measured as identical.
+The implementation is disposable; see `NAVIGATION_TEST.md`.
+
+### Navigation mesh
+
+| Property | Value | Why |
+| --- | --- | --- |
+| `cell_size` | 0.15 | fine enough to resolve the 0.8 m test walls |
+| `cell_height` | **0.05** | see the `agent_max_climb` note below |
+| `agent_radius` | 0.45 | capsule radius 0.40 plus clearance, so paths stand off walls |
+| `agent_height` | 1.8 | capsule height |
+| `agent_max_climb` | 0.25 | matches the player's `max_step_height` |
+| `agent_max_slope` | 46.0 | matches the player's `floor_max_angle_degrees` |
+| `parsed_geometry_type` | mesh instances | the greybox is CSG; collider parsing does not see CSG |
+| `source_geometry_mode` | root node children | `Terrain` now sits under `NavRegion` |
+
+Result: 342 polygons, 316 vertices, baked in ~250 ms.
+
+### Two settings that had to match something else
+
+- **`cell_height` 0.10 → 0.05.** At 0.10 the engine warned that
+  `agent_max_climb` is floored to whole voxels: 0.25 / 0.10 floors to **0.20 m**
+  — exactly the staircase step height, so stair connectivity was decided by
+  rounding. 0.05 divides 0.25 into five whole voxels with no precision loss.
+- **`navigation/3d/default_cell_size` and `default_cell_height`** in
+  `project.godot` were set to 0.15 / 0.05 to match the mesh. Left at the
+  defaults, the navigation map rasterises the baked mesh at a different
+  resolution and warns about edge errors.
+
+### Agent
+
+| Property | Value | Note |
+| --- | --- | --- |
+| `radius` | 0.45 | matches the bake |
+| `height` | 1.8 | matches the bake |
+| `path_desired_distance` | 0.6 | the look-ahead: how close before advancing a waypoint |
+| `target_desired_distance` | 0.35 | equals the existing `arrival_radius` |
+| `path_max_distance` | 3.0 | repath threshold |
+| `avoidance_enabled` | false | one character, no NPCs |
+| `stuck_timeout` | 1.5 s | abandons a destination after no progress |
+
+### Two engine behaviours worth keeping if this is ever rewritten
+
+Both cost real time to find, and both fail *silently* — the navmesh reports a
+healthy polygon count while every query returns the origin.
+
+1. **Do not bake inside `_ready()`.** `CSGShape3D` builds its mesh on a deferred
+   call, so an early bake parses a scene containing only the ground plane.
+   Measured: 126 polygons instead of 342, and straight-line paths through every
+   wall.
+2. **`bake_navigation_mesh()` does not push the result to the navigation
+   server.** It fills the `NavigationMesh` resource only. The region must be
+   updated explicitly with
+   `NavigationServer3D.region_set_navigation_mesh(region.get_rid(), mesh)`, and
+   that call is discarded if it happens before the map's first synchronisation.
+   The bake therefore waits two physics frames, which satisfies both conditions
+   at once.
+
+### Validation
+
+| Case | Result |
+| --- | --- |
+| 1 Direct unobstructed, 16 m | arrived 4.23 s, 0.21 m from target |
+| 2 Around a pillar | arrived 3.83 s, 0.19 m, 13 waypoints |
+| 3 Around the wall | arrived 5.87 s, 0.25 m — routed around the west end |
+| 4 Into the U obstacle | arrived 7.37 s, 0.24 m — went 6 m *away* first, then in |
+| 5 Stair ascent | arrived 2.35 s, mesh climbs 0.1 → 0.7 |
+| 6 Stair descent | arrived 2.35 s |
+| 7 30° ramp ascent | arrived 4.53 s (route is odd — see limitation 1) |
+| 8 30° ramp descent | arrived 4.60 s |
+| 50° ramp click | refused (3.96 m off mesh) |
+| Pillar top click | refused |
+| Platform top click | refused — on mesh but disconnected by a 0.9 m lip |
+| Rapid replacement | immediate |
+| WASD cancellation | destination cleared |
+| Arrival | 0.19–0.25 m from target, speed 0.000, no oscillation |
+| Pressing into an obstacle | direct steering gave up after 1.98 s |
+| Click accuracy at 5 camera extremes | **0.0000 m** every time |
+
+### Non-regression
+
+| Measurement | Phase 1.3 | Phase 1.4 |
+| --- | --- | --- |
+| Walk 0 → 90% | 0.133 s | 0.133 s |
+| Steady sprint | 7.600 m/s | 7.600 m/s |
+| Stop from sprint | 0.100 s / 0.300 m | 0.100 s / 0.300 m |
+| Staircase top | y = 0.601 | y = 0.601 |
+
+---
+
 ## Known problems
 
-1. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
+1. **The 30° ramp is entered from its side rather than its foot.** Technically
+   valid, visibly odd; a greybox rasterisation artefact, recorded and
+   deliberately not papered over. Full explanation in `NAVIGATION_TEST.md`.
+2. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
+   the scene moves, so this is correct here and wrong for anything dynamic.
+3. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
    spring arm punches through terrain constantly and the popping would be blamed
    on the perspective rather than on the arm. The trade is that the camera can
    end up behind tall geometry.
-2. **A click is resolved against the previous frame's camera transform.** Input
+4. **A click is resolved against the previous frame's camera transform.** Input
    is handled before `_process` moves the camera, so a click made during a fast
    zoom or orbit uses a camera pose one frame old. Measured error is 0.0000 m at
    rest, and at 60+ fps this is far below the click's own precision — but it is a
    real ordering detail worth knowing if aiming ever feels off during motion.
-3. **Click-to-move walks in a straight line and has no pathfinding.** The
-   destination is a single ground point, not a computed path. Clicking past a
-   pillar walks the character into the pillar, where it will press against the
-   obstacle until the destination is replaced or WASD is used. This is a
-   deliberate choice: the question under test is whether *issuing intent* feels
-   trustworthy, and a `NavigationRegion3D` bake plus a `NavigationAgent3D` would
-   add a re-baked resource and agent tuning without changing that answer. If the
-   direction is adopted, `NavigationAgent3D` is the obvious next step.
-4. **Step-up rejects a step that has a wall close behind it.** The clearance test
+5. **Routing has no dynamic obstacle handling.** The navmesh is static and
+   `avoidance_enabled` is off. Correct for one player in a fixed greybox; wrong
+   for anything that moves. Straight-line steering is still available via the
+   `Use Navigation` checkbox as the A/B comparison.
+6. **Step-up rejects a step that has a wall close behind it.** The clearance test
    probes forward by the capsule radius (0.45 m), so a 0.20 m step with an
    obstruction within ~0.45 m beyond it reads as a wall and will not be climbed.
    Acceptable for a greybox; would need the probe split into two tests if it ever
    mattered.
-5. **Step-up is not swept.** It is evaluated once per physics frame against the
+7. **Step-up is not swept.** It is evaluated once per physics frame against the
    frame's motion, so at very high speed against a step the character could in
    principle tunnel. Not observed at sprint speed (7.6 m/s = 0.127 m per frame).
-6. **Every camera value remains a judgement, not a measurement.** Distances,
+8. **Every camera value remains a judgement, not a measurement.** Distances,
    pitches, lenses, damping and the zoom curve across all four presets were
    chosen from convention and then checked for geometry, not for how they look.
    That is precisely what `CAMERA_TEST.md` exists to resolve.
-7. **No gamepad has been exercised.** Bindings exist for both sticks,
+9. **No gamepad has been exercised.** Bindings exist for both sticks,
    `A`/cross, left-stick-click, Start, Select and right shoulder, but no
    controller was connected, so deadzones and look speed are unverified. There is
    no gamepad binding for zoom.
-8. **Frame rate is unmeasured under load.** Only headless runs were performed.
+10. **Frame rate is unmeasured under load.** Only headless runs were performed.
    Presets C and H draw considerably more of the scene than A; these are the
    first presets where framerate could plausibly differ.
-9. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
+11. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
    character slides off. That is the intended demonstration, not a bug.
-10. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
+12. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
     `air_deceleration` 3.0 preserve most momentum through a jump. Untested by
     hand.
-11. **Sprint and jump may not belong in this control model at all.** Owner
+13. **Sprint and jump may not belong in this control model at all.** Owner
     observations recorded in `CAMERA_TEST.md`; nothing changed in the build.
 
 ---

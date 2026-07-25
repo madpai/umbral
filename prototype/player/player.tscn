@@ -60,6 +60,15 @@ fov = 75.0
 near = 0.1
 far = 500.0
 
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+radius = 0.45
+height = 1.8
+path_desired_distance = 0.6
+target_desired_distance = 0.35
+path_max_distance = 3.0
+avoidance_enabled = false
+debug_enabled = false
+
 [node name="GroundCheck" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
 target_position = Vector3(0, -2, 0)

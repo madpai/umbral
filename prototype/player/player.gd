@@ -78,6 +78,25 @@ signal destination_requested(screen_position: Vector2)
 ## Anything taller is treated as a wall. See _try_step_up().
 @export_range(0.0, 0.8, 0.01) var max_step_height := 0.25
 
+@export_group("Navigation")
+## Off = the Phase 1.1 straight-line steering, kept so routing can be compared
+## against direct steering. On = follow a NavigationAgent3D path.
+@export var use_navigation := true
+## Should match the capsule. Wider keeps paths further from walls.
+@export_range(0.1, 2.0, 0.05) var agent_radius := 0.45
+@export_range(0.5, 4.0, 0.05) var agent_height := 1.8
+## How close to a waypoint before advancing to the next one. This is the
+## look-ahead: larger cuts corners more, smaller hugs the path.
+@export_range(0.05, 3.0, 0.05) var path_desired_distance := 0.6
+## How close to the final target counts as arrived.
+@export_range(0.05, 3.0, 0.05) var target_desired_distance := 0.35
+## Repath threshold: how far off the path the character may drift before the
+## agent recalculates.
+@export_range(0.5, 20.0, 0.5) var path_max_distance := 3.0
+## Seconds of near-zero speed while pathing before the destination is abandoned.
+## Stops the character pressing into an obstacle indefinitely.
+@export_range(0.0, 10.0, 0.1) var stuck_timeout := 1.5
+
 @export_group("Camera Laboratory")
 ## The perspectives under test. Cycled with F3; see camera/camera_preset.gd.
 ## Framing, pitch, lens and response all live in these resources so that the
@@ -100,6 +119,7 @@ signal destination_requested(screen_position: Vector2)
 @onready var camera: Camera3D = $CameraRig/SpringArm3D/Camera3D
 @onready var ground_check: RayCast3D = $GroundCheck
 @onready var collision: CollisionShape3D = $Collision
+@onready var nav_agent: NavigationAgent3D = $NavigationAgent3D
 
 var state: MoveState = MoveState.GROUNDED
 
@@ -128,6 +148,10 @@ var _zoom_t_smooth := 0.0
 var _zoom_baseline_pitch := 0.0
 ## Where the cursor was when right-drag orbit began, so it can be put back.
 var _orbit_cursor := Vector2.ZERO
+var _stuck_time := 0.0
+## Set when a destination is abandoned because the character stopped making
+## progress. Debug readout only.
+var _gave_up := false
 
 
 func _ready() -> void:
@@ -291,6 +315,8 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 
 	_update_slope()
+	_update_stuck(delta)
+	_update_stuck(delta)
 
 
 # ------------------------------------------------------------- movement ------
@@ -314,14 +340,29 @@ func _movement_direction() -> Vector3:
 	if not _has_destination:
 		return Vector3.ZERO
 
+	# Final arrival is still judged against the REQUESTED destination, using the
+	# Phase 1.1 behaviour: clear it and let ordinary deceleration stop the
+	# character. Nothing is teleported and nothing is snapped.
 	var to_target := _destination - global_position
 	to_target.y = 0.0
 	if to_target.length() <= arrival_radius:
-		# Clear the destination and let normal deceleration bring the character
-		# to rest. Nothing is teleported and nothing is snapped.
 		_has_destination = false
 		return Vector3.ZERO
-	return to_target.normalized()
+
+	if not use_navigation:
+		return to_target.normalized()
+
+	if nav_agent.is_navigation_finished():
+		_has_destination = false
+		return Vector3.ZERO
+
+	# The agent supplies only a DIRECTION. Speed, acceleration, turning, slopes
+	# and step-up are all still the existing physical movement layer.
+	var to_waypoint := nav_agent.get_next_path_position() - global_position
+	to_waypoint.y = 0.0
+	if to_waypoint.length_squared() < 0.000001:
+		return Vector3.ZERO
+	return to_waypoint.normalized()
 
 
 ## Minimal step-up. Not a stair solver: three shape tests and a placement.
@@ -400,6 +441,11 @@ func _update_slope() -> void:
 ## Re-read every frame so Inspector edits apply to the running game.
 func _apply_exports() -> void:
 	floor_max_angle = deg_to_rad(floor_max_angle_degrees)
+	nav_agent.radius = agent_radius
+	nav_agent.height = agent_height
+	nav_agent.path_desired_distance = path_desired_distance
+	nav_agent.target_desired_distance = target_desired_distance
+	nav_agent.path_max_distance = path_max_distance
 	spring_arm.spring_length = current_distance()
 
 
@@ -458,6 +504,22 @@ func _update_zoom(delta: float) -> void:
 	var baseline := deg_to_rad(preset.pitch_at(_zoom_t_smooth))
 	_pitch += baseline - _zoom_baseline_pitch
 	_zoom_baseline_pitch = baseline
+
+
+## Abandons a destination the character has stopped making progress toward, so
+## it can never stand pressing into an obstacle indefinitely.
+func _update_stuck(delta: float) -> void:
+	if not _has_destination or stuck_timeout <= 0.0:
+		_stuck_time = 0.0
+		return
+	if horizontal_speed() < 0.25 and is_on_floor():
+		_stuck_time += delta
+		if _stuck_time >= stuck_timeout:
+			_has_destination = false
+			_stuck_time = 0.0
+			_gave_up = true
+	else:
+		_stuck_time = 0.0
 
 
 ## Effective distance and lens, accounting for zoom when the preset has it.
@@ -523,10 +585,19 @@ func set_destination(point: Vector3) -> void:
 	# A new request replaces the old one immediately; there is no queue.
 	_destination = point
 	_has_destination = true
+	_stuck_time = 0.0
+	_gave_up = false
+	nav_agent.target_position = point
+
+
+## True once the agent has a path and believes the target can be reached.
+func is_target_reachable() -> bool:
+	return nav_agent.is_target_reachable()
 
 
 func clear_destination() -> void:
 	_has_destination = false
+	_stuck_time = 0.0
 
 
 func _apply_mouse_mode() -> void:
@@ -561,6 +632,47 @@ func vertical_speed() -> float:
 
 func state_name() -> String:
 	return "GROUNDED" if state == MoveState.GROUNDED else "AIRBORNE"
+
+
+func navigation_state_name() -> String:
+	if not use_navigation:
+		return "DIRECT STEERING"
+	if _gave_up:
+		return "GAVE UP (no progress)"
+	if not _has_destination:
+		return "idle"
+	return "PATHING"
+
+
+func remaining_path_points() -> int:
+	if not _has_destination or not use_navigation:
+		return 0
+	# The agent recomputes lazily, so immediately after a new destination the
+	# index can briefly exceed the stale path length.
+	return maxi(0, nav_agent.get_current_navigation_path().size()
+			- nav_agent.get_current_navigation_path_index())
+
+
+## Straight-line length of what is left of the computed path.
+func remaining_path_length() -> float:
+	if not _has_destination or not use_navigation:
+		return -1.0
+	var points := nav_agent.get_current_navigation_path()
+	var index := nav_agent.get_current_navigation_path_index()
+	if points.size() == 0 or index >= points.size():
+		return 0.0
+	var total := global_position.distance_to(points[index])
+	for i in range(index, points.size() - 1):
+		total += points[i].distance_to(points[i + 1])
+	return total
+
+
+func set_path_debug(enabled: bool) -> void:
+	nav_agent.debug_enabled = enabled
+
+
+func path_debug_enabled() -> bool:
+	return nav_agent.debug_enabled
 
 
 func camera_zoom_normalised() -> float:

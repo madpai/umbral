@@ -123,6 +123,14 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
 - **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
 
+## 2026-07-25 — Built-in Godot navigation used for the pathfinding experiment
+
+- **Status:** accepted **for this prototype experiment only**; not a production navigation decision
+- **Context:** The provisional click-to-walk direction needed a test of whether a clicked destination can be trusted to produce a sensible route. Straight-line steering walked the character into obstacles.
+- **Decision:** Use stock Godot navigation — `NavigationRegion3D`, `NavigationMesh`, `NavigationAgent3D` — baked once at startup. The agent supplies only a direction; the existing physical movement layer still owns speed, acceleration, turning, slopes and step-up. No navigation manager, no path service, no custom A*, no hierarchy, no dynamic rebuilding, no crowd avoidance, no navigation links.
+- **Consequences:** The implementation is disposable and establishes no production navigation architecture. Unreachable clicks are refused with a red marker rather than resolved to a nearest point, so navmesh holes stay visible; whether that reads as a rule or as being ignored is an open playtest question. Elevated surfaces requiring a jump remain unreachable by design. Movement, step-up, camera, zoom and orbit were re-measured as identical. Whether routing is worth its cost over straight-line steering in this greybox remains unanswered, and an Inspector toggle exists to compare them.
+- **References:** `prototype/NAVIGATION_TEST.md`, `prototype/TUNING.md`.
+
 ## 2026-07-25 — Provisional movement and camera direction
 
 - **Status:** accepted as **provisional prototype direction**; explicitly **not** production canon
