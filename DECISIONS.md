@@ -82,3 +82,11 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Begin the First Valley Initiative as a controlled derivation and validation record. Its geographic and settlement statements remain hypotheses until physical constraints and their consequences are established.
 - **Consequences:** The initiative tests whether UMBRAL's first principles produce a coherent place without feature-first invention. The next gate is geology, watershed, climate, seasons, soil, and natural hazards; settlement history, species, cultures, inhabitants, quests, and magic remain unfinalized.
 - **References:** [The First Valley Initiative](docs/design/world/FIRST_VALLEY.md), [CANON](docs/CANON.md), [Roadmap](ROADMAP.md).
+
+## 2026-07-25 — First-hour gameplay framework established
+
+- **Status:** accepted
+- **Context:** UMBRAL must remain satisfying for players who skip dialogue, lore, or authored narrative while preserving world coherence.
+- **Decision:** Treat dialogue and authored story as optional engagement layers. Every major design receives both a coherence test and a gameplay test. Begin paper vertical-slice design for the first hour.
+- **Consequences:** Gameplay must remain satisfying when narrative content is skipped. Validation alternates with world derivation, beginning with a 10–15 minute playable micro-slice; no first-hour sequence is finalized by the framework.
+- **References:** [Design Philosophy](docs/design/DESIGN_PHILOSOPHY.md), [Gameplay Direction](docs/design/GAMEPLAY_DIRECTION.md), [First-Hour Design Framework](docs/design/experience/FIRST_HOUR.md), [First Valley Initiative](docs/design/world/FIRST_VALLEY.md), [Roadmap](ROADMAP.md).

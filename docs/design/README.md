@@ -6,6 +6,10 @@
 - [Design Philosophy](DESIGN_PHILOSOPHY.md) — immutable principles used to judge design decisions.
 - [Game Design Document](GAME_DESIGN_DOCUMENT.md) — approved design direction
   and open questions.
+- [Gameplay Direction](GAMEPLAY_DIRECTION.md) — the three project pillars
+  governing world coherence, systems depth, and mechanical quality.
+- [First-Hour Design Framework](experience/FIRST_HOUR.md) — controlled paper
+  vertical-slice framework for validating the opening experience.
 
 The documents establish a hierarchy: the Vision explains why UMBRAL exists;
 the Design Philosophy defines the principles that govern decisions; the Game

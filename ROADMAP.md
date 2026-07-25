@@ -45,4 +45,9 @@ Planned sequence:
 ### First Valley Initiative — active
 
 - Current stage: derivation framework and initial hypotheses
+- First-Hour Paper Vertical Slice — active
+- Gameplay validation must alternate with world derivation.
+- Next implementation target: a 10–15 minute playable micro-slice, not a
+  complete game loop.
 - Next gate: establish physical constraints before expanding settlement history
+  and select the smallest playable experience segment for validation.

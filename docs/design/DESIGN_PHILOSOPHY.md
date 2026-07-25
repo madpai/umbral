@@ -451,6 +451,29 @@ A proposal does not need to satisfy every question equally.
 
 It must, however, strengthen the identity of UMBRAL rather than dilute it.
 
+## The Dual Design Test
+
+Every major proposal must answer two questions:
+
+1. Does this make the world more coherent?
+2. Does this create interesting gameplay?
+
+A proposal is not ready when either answer is no.
+
+Lore cannot compensate for weak mechanics.
+
+Mechanical novelty cannot justify incoherent worldbuilding.
+
+Dialogue is optional engagement, not the sole delivery mechanism. Themes should
+be expressed through consequences, spaces, systems, routines, and player
+choices.
+
+Players should be able to create personal stories without consuming authored
+narrative.
+
+Immediate feel, feedback, responsiveness, and clarity are production
+requirements, not polish reserved for the end.
+
 ---
 
 ## Warning Signs
