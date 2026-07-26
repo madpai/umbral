@@ -123,6 +123,14 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
 - **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
 
+## 2026-07-26 — Raven's Hollow atmosphere pass (provisional)
+
+- **Status:** provisional conclusion; passed owner playtest for this experiment only — not final rendering canon
+- **Context:** With the spatial greybox passing owner review ("the layout is easy to learn"), the next question was emotional rather than spatial: can atmosphere alone make Raven's Hollow a place players want to return to, using only dusk lighting, fog and flat emissive materials over the frozen layout.
+- **Decision:** Record the owner verdict: the atmosphere prototype **passes**. Raven's Hollow's emotional identity depends on controlled contrast between warm, localized settlement lighting and colder, darker wilderness — inn windows, forge glow, a village-square campfire and a handful of path lanterns against a dimmer, cooler, fogged dusk everywhere else. The dark gaps between light pools are load-bearing and must be preserved; uniformly lighting the village would undo the effect.
+- **Consequences:** **Do not establish final rendering settings, palette values, fog specifications, or lighting architecture as canon.** Every colour, energy and density value in this pass is a placeholder chosen to test the contrast, not a spec. Known issues carried forward: the nearest lantern fixture reads as visually crude and overbright (a presentation problem, not a direction problem), and window-light placement/falloff will likely need revision in a dedicated art pass. No further atmosphere features are authorized off the strength of this result alone.
+- **References:** `prototype/ATMOSPHERE_TEST.md`, `prototype/RAVENS_HOLLOW_LAYOUT_TEST.md`.
+
 ## 2026-07-26 — Raven's Hollow spatial greybox
 
 - **Status:** accepted **as a spatial prototype only**; establishes no geography, architecture, content or art canon
