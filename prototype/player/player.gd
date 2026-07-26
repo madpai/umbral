@@ -174,6 +174,12 @@ var _hover_target: Interactable = null
 var _interact_elapsed := 0.0
 var _completed_hold_left := 0.0
 var _facing_ok := false
+## CAUSAL STATE — disposable prototype scaffolding, NOT inventory architecture.
+## One bool, owned by the player, shown only on the debug HUD. Nothing reads it
+## except the interaction completion path and the readout.
+var has_log := false
+var _refusal_text := ""
+var _refusal_timer := 0.0
 
 
 func _ready() -> void:
@@ -543,7 +549,13 @@ func _update_zoom(delta: float) -> void:
 func begin_interaction(target: Interactable) -> bool:
 	if target == null:
 		return false
-	if not target.is_available():
+
+	# The object decides whether it will accept work. The player only supplies
+	# its own log state as a bool; the object never learns what a player is.
+	var refusal := target.refusal_reason(has_log)
+	if refusal != "":
+		target.refuse()
+		_show_refusal(refusal)
 		interaction_rejected.emit(target)
 		return false
 
@@ -595,6 +607,9 @@ func set_hover_target(target: Interactable) -> void:
 
 
 func _update_interaction(delta: float) -> void:
+	if _refusal_timer > 0.0:
+		_refusal_timer -= delta
+
 	match interact_state:
 		InteractState.MOVING:
 			if _interact_target == null or not _interact_target.is_available():
@@ -627,13 +642,42 @@ func _update_interaction(delta: float) -> void:
 				_interact_target = null
 				interact_state = InteractState.COMPLETED
 				_completed_hold_left = completed_hold
+				# Order matters: the object changes its own state first, then
+				# the causal effect is applied. Nothing here runs on cancel.
 				finished.complete_interaction()
+				_apply_consequence(finished)
 				interaction_completed.emit(finished)
 
 		InteractState.COMPLETED:
 			_completed_hold_left -= delta
 			if _completed_hold_left <= 0.0:
 				interact_state = InteractState.IDLE
+
+
+## The only place a log is ever granted or consumed. Reached exclusively from
+## the completion branch above, which is why cancelling can never change it.
+func _apply_consequence(finished: Interactable) -> void:
+	match finished.profile.role:
+		InteractionProfile.Role.LOG_SOURCE:
+			if not has_log:
+				has_log = true
+		InteractionProfile.Role.CAMPFIRE:
+			has_log = false
+
+
+func _show_refusal(text: String) -> void:
+	_refusal_text = text
+	_refusal_timer = 1.6
+
+
+## Debug only. Puts the whole causal scenario back to its opening condition.
+func reset_scenario(objects: Array[Interactable]) -> void:
+	cancel_interaction()
+	has_log = false
+	_refusal_text = ""
+	_refusal_timer = 0.0
+	for item in objects:
+		item.reset_scenario()
 
 
 ## Turns the body toward the object using the same smoothing as movement, and
@@ -687,6 +731,14 @@ func interaction_progress() -> float:
 	if _interact_target == null or interact_state != InteractState.INTERACTING:
 		return -1.0
 	return clampf(_interact_elapsed / maxf(_interact_target.profile.duration, 0.01), 0.0, 1.0)
+
+
+func has_log_text() -> String:
+	return "yes" if has_log else "no"
+
+
+func refusal_text() -> String:
+	return _refusal_text if _refusal_timer > 0.0 else ""
 
 
 func hover_target_name() -> String:

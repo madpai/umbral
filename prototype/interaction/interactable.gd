@@ -12,13 +12,18 @@ extends StaticBody3D
 
 signal interaction_completed(interactable: Interactable)
 
-enum VisualState { AVAILABLE, HOVERED, ACTIVE, COMPLETED }
+enum VisualState { AVAILABLE, HOVERED, ACTIVE, COMPLETED, DEPLETED, LIT, REFUSED }
 
 @export var profile: InteractionProfile
 
 @onready var visual: Node3D = $Visual
 @onready var progress_ring: MeshInstance3D = $ProgressRing
 @onready var range_ring: MeshInstance3D = $RangeRing
+## Optional, looked up by name. Hidden when a log source depletes.
+@onready var _canopy: Node3D = get_node_or_null("Visual/Canopy")
+## Optional, looked up by name. Shown when a campfire ignites.
+@onready var _flame: Node3D = get_node_or_null("Visual/Flame")
+@onready var _fire_light: OmniLight3D = get_node_or_null("FireLight")
 
 var _state: VisualState = VisualState.AVAILABLE
 var _meshes: Array[MeshInstance3D] = []
@@ -27,6 +32,11 @@ var _base_colours: Array[Color] = []
 var _visual_base_scale := Vector3.ONE
 var _reset_timer := 0.0
 var _pulse := 0.0
+var _refuse_timer := 0.0
+var _flicker := 0.0
+## Causal state. Disposable prototype scaffolding, not a resource model.
+var depleted := false
+var lit := false
 
 
 func _ready() -> void:
@@ -36,6 +46,10 @@ func _ready() -> void:
 	_collect_meshes(visual)
 	progress_ring.visible = false
 	range_ring.visible = false
+	if _flame != null:
+		_flame.visible = false
+	if _fire_light != null:
+		_fire_light.visible = false
 	range_ring.scale = Vector3(profile.interaction_range, 1.0, profile.interaction_range)
 	_apply_tint()
 
@@ -57,6 +71,20 @@ func _collect_meshes(node: Node) -> void:
 
 
 func _process(delta: float) -> void:
+	if _refuse_timer > 0.0:
+		_refuse_timer -= delta
+		if _refuse_timer <= 0.0:
+			_set_state(VisualState.DEPLETED if depleted
+					else (VisualState.LIT if lit else VisualState.AVAILABLE))
+
+	if lit and _fire_light != null:
+		# Placeholder flicker: a sine on the light energy and the flame scale.
+		# Readability, not atmosphere.
+		_flicker += delta * 9.0
+		_fire_light.light_energy = 3.2 + sin(_flicker) * 0.45 + sin(_flicker * 2.7) * 0.2
+		if _flame != null:
+			_flame.scale = Vector3.ONE * (1.0 + sin(_flicker * 1.6) * 0.09)
+
 	if _state == VisualState.COMPLETED and profile.reset_seconds > 0.0:
 		_reset_timer -= delta
 		if _reset_timer <= 0.0:
@@ -73,7 +101,73 @@ func _process(delta: float) -> void:
 # ------------------------------------------------------------- player API ----
 
 func is_available() -> bool:
+	if depleted or lit:
+		return false
 	return _state != VisualState.COMPLETED
+
+
+## The object's own rule about whether it will accept work right now. Takes the
+## player's log state as a plain bool so the object never learns what a player
+## is. Returns an empty string when the interaction is allowed, otherwise the
+## debug-HUD reason it was refused.
+func refusal_reason(player_has_log: bool) -> String:
+	match profile.role:
+		InteractionProfile.Role.LOG_SOURCE:
+			if depleted:
+				return "%s is bare" % profile.display_name
+			if player_has_log:
+				# One log at a time. Refusing rather than wasting the only tree
+				# in the scene: see CONSEQUENCE_TEST.md.
+				return "already carrying a log"
+		InteractionProfile.Role.CAMPFIRE:
+			if lit:
+				return "%s is already lit" % profile.display_name
+			if not player_has_log:
+				return "no log to burn"
+		_:
+			if _state == VisualState.COMPLETED:
+				return "%s is spent" % profile.display_name
+	return ""
+
+
+## Brief red flash. The whole "you cannot do that" feedback.
+func refuse() -> void:
+	_refuse_timer = profile.refuse_flash_seconds
+	_set_state(VisualState.REFUSED)
+
+
+func deplete() -> void:
+	depleted = true
+	if _canopy != null:
+		_canopy.visible = false
+	_set_state(VisualState.DEPLETED)
+
+
+func ignite() -> void:
+	lit = true
+	if _flame != null:
+		_flame.visible = true
+	if _fire_light != null:
+		_fire_light.visible = true
+	_set_state(VisualState.LIT)
+
+
+## Debug-only. Puts the object back to its opening condition.
+func reset_scenario() -> void:
+	depleted = false
+	lit = false
+	_refuse_timer = 0.0
+	_reset_timer = 0.0
+	progress_ring.visible = false
+	if _canopy != null:
+		_canopy.visible = true
+	if _flame != null:
+		_flame.visible = false
+	if _fire_light != null:
+		_fire_light.visible = false
+		_fire_light.light_energy = 3.2
+	visual.scale = _visual_base_scale
+	_set_state(VisualState.AVAILABLE)
 
 
 func interaction_range() -> float:
@@ -118,8 +212,14 @@ func cancel_interaction() -> void:
 
 func complete_interaction() -> void:
 	progress_ring.visible = false
-	_set_state(VisualState.COMPLETED)
-	_reset_timer = profile.reset_seconds
+	match profile.role:
+		InteractionProfile.Role.LOG_SOURCE:
+			deplete()
+		InteractionProfile.Role.CAMPFIRE:
+			ignite()
+		_:
+			_set_state(VisualState.COMPLETED)
+			_reset_timer = profile.reset_seconds
 	# The visible "something happened" beat. Deliberately just a pop and a
 	# colour change: no felling, no resources, no inventory.
 	var tween := create_tween()
@@ -139,6 +239,9 @@ func state_name() -> String:
 		VisualState.HOVERED: return "hovered"
 		VisualState.ACTIVE: return "active"
 		VisualState.COMPLETED: return "completed"
+		VisualState.DEPLETED: return "depleted"
+		VisualState.LIT: return "lit"
+		VisualState.REFUSED: return "refused"
 		_: return "available"
 
 
@@ -161,6 +264,15 @@ func _apply_tint() -> void:
 			strength = profile.tint_strength
 		VisualState.COMPLETED:
 			tint = profile.complete_tint
+			strength = profile.tint_strength
+		VisualState.DEPLETED:
+			tint = profile.depleted_tint
+			strength = profile.tint_strength
+		VisualState.LIT:
+			tint = profile.active_tint
+			strength = profile.tint_strength * 0.5
+		VisualState.REFUSED:
+			tint = profile.refuse_tint
 			strength = profile.tint_strength
 	for i in _materials.size():
 		_materials[i].albedo_color = _base_colours[i].lerp(tint, strength)

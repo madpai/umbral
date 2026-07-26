@@ -52,7 +52,7 @@ func _on_interaction_rejected(_target: Interactable) -> void:
 	_marker.visible = true
 	_reject_timer = REJECT_FLASH_SECONDS
 
-const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F5: ranges   ·   F4: path debug   ·   F3: cameras   ·   F2: modes   ·   F1: reset"
+const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F6: reset scenario   ·   F5: ranges   ·   F4: path debug   ·   F3: cameras   ·   F2: modes   ·   F1: reset"
 const CONTROLS_DIRECT := "WASD: move (cancels path)   ·   Mouse: look   ·   Wheel: zoom   ·   Shift: sprint   ·   Space: jump\nF4: path debug   ·   F3: cameras   ·   F2: control modes   ·   F1: reset   ·   Esc: free mouse"
 
 
@@ -156,6 +156,8 @@ func _set_marker_rejected(rejected: bool) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_path_debug"):
 		_player.set_path_debug(not _player.path_debug_enabled())
+	elif event.is_action_pressed("reset_scenario"):
+		_player.reset_scenario(_interactables)
 
 
 func _process(delta: float) -> void:
@@ -186,6 +188,8 @@ func _process(delta: float) -> void:
 		path_text = "%5.2f m over %d pts" % [path_length, _player.remaining_path_points()]
 	elif _reject_timer > 0.0:
 		path_text = "UNREACHABLE"
+	var refusal := _player.refusal_text()
+	var refusal_text := "" if refusal == "" else "        (%s)" % refusal
 	var progress := _player.interaction_progress()
 	var progress_text := "" if progress < 0.0 else "  %3.0f%%" % (progress * 100.0)
 	var controls := CONTROLS_CLICK if _player.control_mode == PrototypePlayer.ControlMode.CLICK_TO_MOVE \
@@ -201,6 +205,7 @@ func _process(delta: float) -> void:
 		"interact   %-11s %s%s" % [
 			_player.interaction_state_name(), _player.interaction_target_name(), progress_text],
 		"hover      %s" % _player.hover_target_name(),
+		"log        %s%s" % [_player.has_log_text(), refusal_text],
 		"path       %s" % path_text,
 		"fps        %5d" % Engine.get_frames_per_second(),
 		"speed      %5.2f m/s" % _player.horizontal_speed(),

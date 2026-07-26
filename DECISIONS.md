@@ -123,6 +123,14 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
 - **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
 
+## 2026-07-25 — Temporary one-log causal loop for testing visible consequence
+
+- **Status:** accepted **for this prototype experiment only**; explicitly **not** inventory, gathering, crafting or resource architecture
+- **Context:** The interaction prototype passed while producing nothing. The next question is whether interacting feels more satisfying when the action creates a clear, visible consequence.
+- **Decision:** Add one causal loop — a tree grants one log and depletes; a campfire consumes that log and ignites. Possession is a single boolean on the player (`has_log`); each object holds one boolean of its own (`depleted`, `lit`). Objects decide whether they will accept work; the player applies the consequence in one function reached only from the interaction completion branch. No manager, no shared store, no item definitions.
+- **Consequences:** All causal state is disposable scaffolding and must not be cited as precedent for inventory, item, resource or gathering design. A cancelled interaction cannot grant, consume, deplete or ignite anything — verified across approach and mid-work cancellation for both objects. Two behaviours were chosen for being smaller and are documented: the tree refuses when the player already carries a log rather than completing and granting nothing (the literal reading dead-ends the single-tree scene), and a lit campfire refuses further clicks rather than running a placeholder interaction. Interaction durations were **not** lengthened to simulate production pacing; only the campfire moved 0.9 → 1.1 s so the two actions are distinguishable. F6 resets the scenario. Carrying a log remains invisible outside the debug HUD, which is the weakest link in the chain and is recorded as a limitation.
+- **References:** `prototype/CONSEQUENCE_TEST.md`, `prototype/TUNING.md`.
+
 ## 2026-07-25 — Interaction prototype passed owner playtest
 
 - **Status:** accepted (verdict); the two recorded observations are **provisional and not canon**
@@ -138,6 +146,16 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Decision:** Objects are `Interactable` (`StaticBody3D` + script) owning their own behaviour and feedback, configured by lightweight `InteractionProfile` resources. The player owns orchestration — hover target, current target, range, state machine (IDLE / MOVING / INTERACTING / COMPLETED) and interruption. `main.gd` only routes the click. No interaction manager, no registry, no global state. The interaction deliberately produces nothing.
 - **Consequences:** Completion itself is what gets evaluated; if the loop is not satisfying without a reward, adding rewards would hide that answer rather than fix it. No inventory, resources, crafting, skills, experience, quests or UI were added. Objects reset a few seconds after completing purely so repeats can be tested — this is not a respawn or resource decision. Movement, camera and navigation were re-measured as identical. Whether interaction needs a reward, whether work should be interruptible, and what a second click should do all remain unresolved.
 - **References:** `prototype/INTERACTION_TEST.md`, `prototype/TUNING.md`.
+
+## 2026-07-25 — World-First Inventory Communication (Provisional)
+
+- **Status:** provisional design direction; not settled canon or inventory architecture
+- **Prototype observations:** The consequence prototype demonstrated visible world consequence through tree depletion and campfire ignition. The temporary log was communicated almost entirely through the debug HUD, making the carried state the weakest part of the experience.
+- **Design philosophy:** Ordinary gathering should prioritize pacing. Repetitive logistics should be abstracted where appropriate. Whenever practical, player state should be communicated through the world before it is communicated through interface.
+- **Decision:** A visible backpack is currently the leading design direction for communicating carried equipment and resources. This direction is intended to communicate progression and activity without requiring physical carrying of every gathered resource.
+- **Implementation boundary:** This is not an inventory specification and does not commit to slot counts, weight systems, stack sizes, encumbrance, crafting, or persistence. Further prototype work is required before inventory architecture is designed.
+- **Design note:** A backpack that visibly changes, equipment hanging from the pack, a lantern, bedroll, fishing rod, herbs, and bundles are examples only. They are not required assets or mechanics.
+- **References:** [Consequence Experiment](prototype/CONSEQUENCE_TEST.md), [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md).
 
 ## 2026-07-25 — Built-in Godot navigation used for the pathfinding experiment
 

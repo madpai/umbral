@@ -4,11 +4,12 @@
 
 [resource]
 script = ExtResource("1_p")
+role = 2
 display_name = "Campfire"
 interaction_range = 2.0
 approach_fraction = 0.65
 facing_tolerance_degrees = 30.0
-duration = 0.9
+duration = 1.1
 reset_seconds = 3.0
 tint_strength = 0.55
 pulse_speed = 4.0

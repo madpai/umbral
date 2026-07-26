@@ -3,8 +3,9 @@
 Phase 1 (movement and camera), Phase 1.1 (jitter correction, step-up,
 click-to-move experiment), Phase 1.2 (camera & perspective laboratory),
 Phase 1.3 (Hybrid World orbit + zoom camera), Phase 1.4 (navigation experiment
-— see `NAVIGATION_TEST.md`) and Phase 1.5 (interaction experiment — see
-`INTERACTION_TEST.md`). This file is the actual research output of the
+— see `NAVIGATION_TEST.md`), Phase 1.5 (interaction experiment — see
+`INTERACTION_TEST.md`) and Phase 1.6 (first consequence — see
+`CONSEQUENCE_TEST.md`). This file is the actual research output of the
 prototype. The code is disposable; these numbers are not.
 
 Phase 1 has been played by the owner and passed provisionally. **Nothing in the
@@ -600,57 +601,123 @@ be visible), `show_interaction_ranges` false (F5).
 
 ---
 
+## Phase 1.6 — 2026-07-25 (first consequence: one log)
+
+One causal loop — tree grants a log, campfire consumes it and ignites. Movement,
+camera, navigation and the interaction flow are untouched and were re-measured
+as identical. All causal state is disposable scaffolding; see
+`CONSEQUENCE_TEST.md`.
+
+### Durations — deliberately NOT lengthened
+
+| Object | `duration` | Change | Why |
+| --- | --- | --- | --- |
+| Tree | **1.8 s** | unchanged | the heavier of the two actions |
+| Campfire | **1.1 s** | 0.9 → 1.1 s | lighting should read as an action, not a toggle, but stay clearly lighter than felling |
+| Rock | **1.2 s** | unchanged | untouched control object, still produces nothing |
+
+The campfire moved by 0.2 s purely so the two actions are distinguishable by
+feel. **Nothing was slowed to simulate production pacing.** The owner
+observation that production should feel slower, heavier and more deliberate is
+recorded and deferred: a longer timer is not weight, and pacing cannot be judged
+until animation, sound, anticipation, impact and world response exist together.
+
+### New feedback timing
+
+| Property | Value | Note |
+| --- | --- | --- |
+| `refuse_flash_seconds` | 0.5 | red flash when an object refuses |
+| refusal HUD text | 1.6 s | debug line only, no UI |
+| `completed_hold` | 0.45 s | unchanged |
+| fire flicker | 9.0 rad/s on light energy, 3.2 ± ~0.65 | placeholder readability |
+
+### Validation
+
+| Case | Result |
+| --- | --- |
+| 1 Tree grants one log, only on completion | log=yes, tree=depleted |
+| 2 Cancel while approaching | log=no, tree=available — nothing granted |
+| 2 Cancel mid-work | log=no, tree=available — nothing granted |
+| 3 Tree visibly depletes | canopy hidden, trunk darkened, state persists |
+| 4 Depleted tree refuses | refused, "Tree is bare"; reverts to depleted after the flash |
+| 5 Campfire without a log refuses | refused, "no log to burn", stays unlit |
+| 6 Full loop tree → log → fire | log carried across |
+| 7 Cancel approaching the fire | log survives |
+| 7 Cancel mid-lighting | log survives |
+| 8 Completion consumes the log | log=no |
+| 9 Campfire visibly ignites | flame visible, light on, energy flickering ~2.98–3.6 |
+| 10 Lit fire refuses more logs | refused, "Campfire is already lit"; reverts to lit |
+| 11 After max zoom + 180° orbit | full loop still works |
+| 12 Rapid target switching ×18 | nothing granted, nothing consumed, no invalid state |
+| 13 F6 reset | log=no, tree=available, fire=available, light off, canopy back |
+
+### Non-regression
+
+| Measurement | Phase 1.5 | Phase 1.6 |
+| --- | --- | --- |
+| Walk 0 → 90% | 0.133 s | 0.133 s |
+| Steady sprint | 7.600 m/s | 7.600 m/s |
+| Stop from sprint | 0.100 s / 0.300 m | 0.100 s / 0.300 m |
+| Staircase top | y = 0.601 | y = 0.601 |
+| Click-to-move arrival | 0.188 m / 0.000 m/s | 0.188 m / 0.000 m/s |
+
+---
+
 ## Known problems
 
 1. **Interaction has no character animation and no sound.** The pulse is on the
    object, not the body. Both absences make completion feel flatter than it
    would in production; judge the timing and flow, not the performance.
-2. **Interaction produces nothing, by design.** No resource, item or number.
+2. **Carrying a log is invisible.** Nothing is held and nothing changes on
+   screen; `log: yes` appears only in the debug HUD. The middle of the causal
+   chain is therefore its weakest link, and that will colour any verdict on
+   whether consequence improves satisfaction.
+3. **Interaction produces nothing, by design.** No resource, item or number.
    Whether completion needs a reward to satisfy is the open question, not a
    defect.
-3. **The 30° ramp is entered from its side rather than its foot.** Technically
+4. **The 30° ramp is entered from its side rather than its foot.** Technically
    valid, visibly odd; a greybox rasterisation artefact, recorded and
    deliberately not papered over. Full explanation in `NAVIGATION_TEST.md`.
-4. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
+5. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
    the scene moves, so this is correct here and wrong for anything dynamic.
-5. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
+6. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
    spring arm punches through terrain constantly and the popping would be blamed
    on the perspective rather than on the arm. The trade is that the camera can
    end up behind tall geometry.
-6. **A click is resolved against the previous frame's camera transform.** Input
+7. **A click is resolved against the previous frame's camera transform.** Input
    is handled before `_process` moves the camera, so a click made during a fast
    zoom or orbit uses a camera pose one frame old. Measured error is 0.0000 m at
    rest, and at 60+ fps this is far below the click's own precision — but it is a
    real ordering detail worth knowing if aiming ever feels off during motion.
-7. **Routing has no dynamic obstacle handling.** The navmesh is static and
+8. **Routing has no dynamic obstacle handling.** The navmesh is static and
    `avoidance_enabled` is off. Correct for one player in a fixed greybox; wrong
    for anything that moves. Straight-line steering is still available via the
    `Use Navigation` checkbox as the A/B comparison.
-8. **Step-up rejects a step that has a wall close behind it.** The clearance test
+9. **Step-up rejects a step that has a wall close behind it.** The clearance test
    probes forward by the capsule radius (0.45 m), so a 0.20 m step with an
    obstruction within ~0.45 m beyond it reads as a wall and will not be climbed.
    Acceptable for a greybox; would need the probe split into two tests if it ever
    mattered.
-9. **Step-up is not swept.** It is evaluated once per physics frame against the
+10. **Step-up is not swept.** It is evaluated once per physics frame against the
    frame's motion, so at very high speed against a step the character could in
    principle tunnel. Not observed at sprint speed (7.6 m/s = 0.127 m per frame).
-10. **Every camera value remains a judgement, not a measurement.** Distances,
+11. **Every camera value remains a judgement, not a measurement.** Distances,
    pitches, lenses, damping and the zoom curve across all four presets were
    chosen from convention and then checked for geometry, not for how they look.
    That is precisely what `CAMERA_TEST.md` exists to resolve.
-11. **No gamepad has been exercised.** Bindings exist for both sticks,
+12. **No gamepad has been exercised.** Bindings exist for both sticks,
    `A`/cross, left-stick-click, Start, Select and right shoulder, but no
    controller was connected, so deadzones and look speed are unverified. There is
    no gamepad binding for zoom.
-12. **Frame rate is unmeasured under load.** Only headless runs were performed.
+13. **Frame rate is unmeasured under load.** Only headless runs were performed.
    Presets C and H draw considerably more of the scene than A; these are the
    first presets where framerate could plausibly differ.
-13. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
+14. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
    character slides off. That is the intended demonstration, not a bug.
-14. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
+15. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
     `air_deceleration` 3.0 preserve most momentum through a jump. Untested by
     hand.
-15. **Sprint and jump may not belong in this control model at all.** Owner
+16. **Sprint and jump may not belong in this control model at all.** Owner
     observations recorded in `CAMERA_TEST.md`; nothing changed in the build.
 
 ---

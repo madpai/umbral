@@ -8,8 +8,17 @@
 class_name InteractionProfile
 extends Resource
 
+## What this object does when an interaction completes. Three cases, hard-coded,
+## because there are three objects. This is NOT an effect system.
+enum Role {
+	PLACEHOLDER,  ## completes and resets; produces nothing
+	LOG_SOURCE,   ## grants one log, then depletes permanently
+	CAMPFIRE,     ## consumes one log and ignites, then stays lit
+}
+
 ## Shown on the debug HUD.
 @export var display_name := "Object"
+@export var role: Role = Role.PLACEHOLDER
 
 @export_group("Approach")
 ## The character stops and works once it is this close to the object.
@@ -32,6 +41,11 @@ extends Resource
 @export var hover_tint := Color(1.0, 0.95, 0.7, 1.0)
 @export var active_tint := Color(1.0, 0.75, 0.35, 1.0)
 @export var complete_tint := Color(0.55, 0.85, 0.55, 1.0)
+## Used for the depleted stump and any other spent state.
+@export var depleted_tint := Color(0.32, 0.28, 0.24, 1.0)
+## Flashed when the object refuses an interaction.
+@export var refuse_tint := Color(0.9, 0.3, 0.25, 1.0)
+@export_range(0.1, 3.0, 0.05) var refuse_flash_seconds := 0.5
 ## How strongly hover/active tints replace the object's own colour.
 @export_range(0.0, 1.0, 0.05) var tint_strength := 0.55
 ## Pulses per second while interacting.

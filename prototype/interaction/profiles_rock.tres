@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_p")
+role = 0
 display_name = "Rock"
 interaction_range = 2.2
 approach_fraction = 0.7
