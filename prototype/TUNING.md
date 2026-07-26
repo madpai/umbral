@@ -4,8 +4,8 @@ Phase 1 (movement and camera), Phase 1.1 (jitter correction, step-up,
 click-to-move experiment), Phase 1.2 (camera & perspective laboratory),
 Phase 1.3 (Hybrid World orbit + zoom camera), Phase 1.4 (navigation experiment
 — see `NAVIGATION_TEST.md`), Phase 1.5 (interaction experiment — see
-`INTERACTION_TEST.md`) and Phase 1.6 (first consequence — see
-`CONSEQUENCE_TEST.md`). This file is the actual research output of the
+`INTERACTION_TEST.md`) Phase 1.6 (first consequence — see `CONSEQUENCE_TEST.md`) and Phase 1.7
+(Raven's Hollow spatial greybox — see `RAVENS_HOLLOW_LAYOUT_TEST.md`). This file is the actual research output of the
 prototype. The code is disposable; these numbers are not.
 
 Phase 1 has been played by the owner and passed provisionally. **Nothing in the
@@ -663,61 +663,160 @@ until animation, sound, anticipation, impact and world response exist together.
 
 ---
 
+## Phase 1.7 — 2026-07-26 (Raven's Hollow spatial greybox)
+
+A village, not a system. `village.tscn` is now the main scene; `main.tscn`
+remains the untouched systems lab and both share `ui/debug_hud.tscn` and
+`main.gd`. No gameplay was added. Movement, camera, navigation, interaction and
+the consequence loop were re-measured as identical.
+
+### Engine settings that changed
+
+| Setting | Old | New | Why |
+| --- | --- | --- | --- |
+| navmesh `cell_size` (both scenes) | 0.15 | **0.25** | the village bakes 7,696 polygons; at 0.15 the bake took 3.7 s at every launch, at 0.25 it takes 0.9 s |
+| navmesh `agent_radius` (both scenes) | 0.45 | **0.5** | must be a whole number of cells or the engine ceils it and warns |
+| `navigation/3d/default_cell_size` | 0.15 | 0.25 | must match the meshes |
+| bridge deck height | — | **0.12 m** | see below |
+
+### Three bugs worth keeping if this is ever rebuilt
+
+1. **Godot's 12-float `Transform3D` takes basis ROWS, not columns.** Emitting
+   columns yawed every rotated object by the *negative* of the intended angle.
+   The plan view looked correct while the 3D scene was mirrored: the stream
+   channel leaned against its own polyline and left gaps that the navmesh walked
+   straight through. Symptom was a stream that was not a barrier anywhere.
+2. **A bridge deck standing 0.5 m proud of the bank is not a bridge.** It
+   exceeds `agent_max_climb` (0.25 m), so the navmesh cannot step onto it and
+   treats it as an island. Measured: spawn to the square routed 205 m around
+   instead of 109 m across. Decks now sit at 0.12 m.
+3. **`NavigationServer3D.map_get_path` returns a PARTIAL path when the target is
+   unreachable.** A *short* path across the stream means blocked, not crossed —
+   the first barrier test had its logic inverted and reported working geometry
+   as leaking.
+
+Also: the `_nav_ready` poll in `main.gd` now waits until the navigation map can
+actually locate the player rather than waiting a fixed frame. One frame is
+enough for the small lab and far too few for an 7,696-polygon village, during
+which every query silently returns the origin.
+
+### Terrain construction
+
+The ground is a single 400 x 400 `CSGCombiner3D`: one base box with the stream
+channel subtracted out of it as nine rotated boxes plus a cylinder at each bend.
+Verified in isolation before use — CSG subtraction gives exact collision *and*
+the navmesh treats the carved channel as a genuine barrier.
+
+### Validation
+
+| Check | Result |
+| --- | --- |
+| Landmarks reachable from spawn | **22 of 22**, most stopping within 0.2 m |
+| Stream crossings outside the two bridges | **0 of 25 sampled** |
+| Spawn to square crosses the main bridge | yes |
+| Square to mill crosses the footbridge | yes |
+| South gate to north gate | 167 m, 37 s at walking pace |
+| Square to well / store / smithy / inn | 10 / 14 / 17 / 29 m |
+| Square to ruins | 183 m, 41 s — reachable, off every route |
+| Walked spawn to square | 25.3 s, stopped 0.25 m from target |
+| Walked square to mill | 25.3 s, stopped 0.23 m from target |
+| Consequence loop in the village | tree gives log, campfire lights |
+| Navmesh bake at launch | 0.91 s, 7,696 polygons |
+
+### Non-regression
+
+| Measurement | Phase 1.6 | Phase 1.7 |
+| --- | --- | --- |
+| Walk 0 to 90% | 0.133 s | 0.133 s |
+| Steady sprint | 7.600 m/s | 7.600 m/s |
+| Stop from sprint | 0.100 s / 0.300 m | 0.100 s / 0.300 m |
+| Launch camera preset | Hybrid World | Hybrid World |
+
+No interaction timing, camera value or movement value was changed.
+
+---
+
+### 2026-07-26 — the debug readout was eating mouse input
+
+- **Observed problem:** right-drag no longer orbited the camera.
+- **Cause:** the debug HUD is a `PanelContainer`, and Godot Controls default to
+  `mouse_filter = STOP`. It silently consumed every mouse event inside its rect
+  before `_unhandled_input` ever saw one. This was always true, but the panel
+  started small; as readout lines were added for navigation, interaction and the
+  causal loop it grew to roughly 470 x 400 px, and with it the dead zone in the
+  top-left corner of the screen.
+- **Fix:** `mouse_filter = 2` (IGNORE) on the panel, its margin and its label. A
+  debug overlay should never be able to swallow gameplay input.
+- **Also added:** `F7` hides and shows the readout. While hidden, the HUD text is
+  not rebuilt each frame.
+- **Not a bug, worth knowing:** measuring mouse look headlessly reports rotation
+  about 25x too large. `window/stretch/mode` is `canvas_items`, and with no real
+  window the stretch transform scales `InputEventMouseMotion.relative` by a
+  nonsense factor. In a real window it is 1.0 at the 1600x900 base. The side
+  effect that IS real: look sensitivity scales with window size, so a much
+  larger window feels slightly less sensitive than the tuned value.
+
+---
+
 ## Known problems
 
-1. **Interaction has no character animation and no sound.** The pulse is on the
-   object, not the body. Both absences make completion feel flatter than it
-   would in production; judge the timing and flow, not the performance.
+1. **Raven's Hollow is empty and unlit.** No people, no props, no interiors, no
+   warm windows — which is exactly the "warm light against a dark world" the
+   concept is about. Judge the shape, not the atmosphere. Full list in
+   `RAVENS_HOLLOW_LAYOUT_TEST.md`.
 2. **Carrying a log is invisible.** Nothing is held and nothing changes on
    screen; `log: yes` appears only in the debug HUD. The middle of the causal
    chain is therefore its weakest link, and that will colour any verdict on
    whether consequence improves satisfaction.
-3. **Interaction produces nothing, by design.** No resource, item or number.
+3. **Interaction has no character animation and no sound.** The pulse is on the
+   object, not the body. Both absences make completion feel flatter than it
+   would in production; judge the timing and flow, not the performance.
+4. **Interaction produces nothing, by design.** No resource, item or number.
    Whether completion needs a reward to satisfy is the open question, not a
    defect.
-4. **The 30° ramp is entered from its side rather than its foot.** Technically
+5. **The 30° ramp is entered from its side rather than its foot.** Technically
    valid, visibly odd; a greybox rasterisation artefact, recorded and
    deliberately not papered over. Full explanation in `NAVIGATION_TEST.md`.
-5. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
+6. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
    the scene moves, so this is correct here and wrong for anything dynamic.
-6. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
+7. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
    spring arm punches through terrain constantly and the popping would be blamed
    on the perspective rather than on the arm. The trade is that the camera can
    end up behind tall geometry.
-7. **A click is resolved against the previous frame's camera transform.** Input
+8. **A click is resolved against the previous frame's camera transform.** Input
    is handled before `_process` moves the camera, so a click made during a fast
    zoom or orbit uses a camera pose one frame old. Measured error is 0.0000 m at
    rest, and at 60+ fps this is far below the click's own precision — but it is a
    real ordering detail worth knowing if aiming ever feels off during motion.
-8. **Routing has no dynamic obstacle handling.** The navmesh is static and
+9. **Routing has no dynamic obstacle handling.** The navmesh is static and
    `avoidance_enabled` is off. Correct for one player in a fixed greybox; wrong
    for anything that moves. Straight-line steering is still available via the
    `Use Navigation` checkbox as the A/B comparison.
-9. **Step-up rejects a step that has a wall close behind it.** The clearance test
+10. **Step-up rejects a step that has a wall close behind it.** The clearance test
    probes forward by the capsule radius (0.45 m), so a 0.20 m step with an
    obstruction within ~0.45 m beyond it reads as a wall and will not be climbed.
    Acceptable for a greybox; would need the probe split into two tests if it ever
    mattered.
-10. **Step-up is not swept.** It is evaluated once per physics frame against the
+11. **Step-up is not swept.** It is evaluated once per physics frame against the
    frame's motion, so at very high speed against a step the character could in
    principle tunnel. Not observed at sprint speed (7.6 m/s = 0.127 m per frame).
-11. **Every camera value remains a judgement, not a measurement.** Distances,
+12. **Every camera value remains a judgement, not a measurement.** Distances,
    pitches, lenses, damping and the zoom curve across all four presets were
    chosen from convention and then checked for geometry, not for how they look.
    That is precisely what `CAMERA_TEST.md` exists to resolve.
-12. **No gamepad has been exercised.** Bindings exist for both sticks,
+13. **No gamepad has been exercised.** Bindings exist for both sticks,
    `A`/cross, left-stick-click, Start, Select and right shoulder, but no
    controller was connected, so deadzones and look speed are unverified. There is
    no gamepad binding for zoom.
-13. **Frame rate is unmeasured under load.** Only headless runs were performed.
+14. **Frame rate is unmeasured under load.** Only headless runs were performed.
    Presets C and H draw considerably more of the scene than A; these are the
    first presets where framerate could plausibly differ.
-14. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
+15. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
    character slides off. That is the intended demonstration, not a bug.
-15. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
+16. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
     `air_deceleration` 3.0 preserve most momentum through a jump. Untested by
     hand.
-16. **Sprint and jump may not belong in this control model at all.** Owner
+17. **Sprint and jump may not belong in this control model at all.** Owner
     observations recorded in `CAMERA_TEST.md`; nothing changed in the build.
 
 ---

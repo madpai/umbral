@@ -17,6 +17,7 @@ const REJECT_MATERIAL := preload("res://reject_material.tres")
 
 @onready var _player: PrototypePlayer = $Player
 @onready var _label: Label = $HUD/Panel/Margin/DebugLabel
+@onready var _hud_panel: Control = $HUD/Panel
 @onready var _marker: Node3D = $DestinationMarker
 @onready var _nav_region: NavigationRegion3D = $NavRegion
 @onready var _marker_disc: MeshInstance3D = $DestinationMarker/Disc
@@ -52,7 +53,7 @@ func _on_interaction_rejected(_target: Interactable) -> void:
 	_marker.visible = true
 	_reject_timer = REJECT_FLASH_SECONDS
 
-const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F6: reset scenario   ·   F5: ranges   ·   F4: path debug   ·   F3: cameras   ·   F2: modes   ·   F1: reset"
+const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F7: hide this readout   ·   F6: reset scenario   ·   F5: ranges   ·   F4: path debug   ·   F3: cameras   ·   F2: modes   ·   F1: reset"
 const CONTROLS_DIRECT := "WASD: move (cancels path)   ·   Mouse: look   ·   Wheel: zoom   ·   Shift: sprint   ·   Space: jump\nF4: path debug   ·   F3: cameras   ·   F2: control modes   ·   F1: reset   ·   Esc: free mouse"
 
 
@@ -84,7 +85,16 @@ func _bake_navigation() -> void:
 	# map reporting 342 polygons while every server query returns the origin.
 	NavigationServer3D.region_set_navigation_mesh(
 			_nav_region.get_rid(), _nav_region.navigation_mesh)
-	await get_tree().physics_frame
+	# A single frame is enough for the small test lab but NOT for the village:
+	# the map needs several syncs before an 8000-polygon mesh answers queries,
+	# and until it does every query silently returns the origin. Poll until the
+	# map can actually locate the player rather than guessing a frame count.
+	var map := get_world_3d().navigation_map
+	for i in range(120):
+		await get_tree().physics_frame
+		var here := _player.global_position
+		if NavigationServer3D.map_get_closest_point(map, here).distance_to(here) < 5.0:
+			break
 	_nav_ready = true
 	# The marker is teleported, never simulated, so it must not be interpolated.
 	_marker.physics_interpolation_mode = Node.PHYSICS_INTERPOLATION_MODE_OFF
@@ -158,10 +168,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		_player.set_path_debug(not _player.path_debug_enabled())
 	elif event.is_action_pressed("reset_scenario"):
 		_player.reset_scenario(_interactables)
+	elif event.is_action_pressed("toggle_debug_hud"):
+		_hud_panel.visible = not _hud_panel.visible
 
 
 func _process(delta: float) -> void:
 	_player.set_hover_target(_hovered_interactable())
+	if not _hud_panel.visible:
+		# Nothing to write, and formatting it every frame would be waste.
+		return
 	if _ranges_shown != _player.show_interaction_ranges:
 		_ranges_shown = _player.show_interaction_ranges
 		for item in _interactables:

@@ -62,6 +62,7 @@ godot --path /home/commander/Documents/umbral/prototype
 | **F3** | Next camera preset (cycles H → A → B → C → H) |
 | F2 | Switch control mode (click-to-move ↔ WASD) |
 | F1 | Reset to spawn |
+| **F7** | Hide/show the debug readout |
 | Left click | Set destination (click-to-move mode) |
 | Hold right mouse | Orbit camera (click-to-move mode) |
 | Esc | Release mouse for Inspector edits (WASD mode) |

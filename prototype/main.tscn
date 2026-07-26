@@ -8,6 +8,7 @@
 [ext_resource type="Resource" path="res://interaction/profiles_tree.tres" id="9_p_tree"]
 [ext_resource type="Resource" path="res://interaction/profiles_rock.tres" id="10_p_rock"]
 [ext_resource type="Resource" path="res://interaction/profiles_campfire.tres" id="11_p_fire"]
+[ext_resource type="PackedScene" path="res://ui/debug_hud.tscn" id="12_hud"]
 [ext_resource type="Resource" path="res://camera/presets/a_classic_third_person.tres" id="4_cam_a"]
 [ext_resource type="Resource" path="res://camera/presets/b_adventure.tres" id="5_cam_b"]
 [ext_resource type="Resource" path="res://camera/presets/c_high_strategy.tres" id="6_cam_c"]
@@ -71,10 +72,10 @@ size = Vector3(0.06, 1.1, 0.06)
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_world"]
 vertices_per_polygon = 6.0
-cell_size = 0.15
+cell_size = 0.25
 cell_height = 0.05
 agent_height = 1.8
-agent_radius = 0.45
+agent_radius = 0.5
 agent_max_climb = 0.25
 agent_max_slope = 46.0
 region_min_size = 2.0
@@ -161,13 +162,6 @@ albedo_color = Color(1, 0.82, 0.3, 0.75)
 transparency = 1
 shading_mode = 0
 albedo_color = Color(0.45, 0.75, 1, 0.16)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-bg_color = Color(0.0509804, 0.0588235, 0.0705882, 0.72)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
@@ -389,22 +383,4 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
 mesh = SubResource("BoxMesh_marker_post")
 surface_material_override/0 = SubResource("StandardMaterial3D_marker")
 
-[node name="HUD" type="CanvasLayer" parent="."]
-
-[node name="Panel" type="PanelContainer" parent="HUD"]
-offset_left = 16.0
-offset_top = 16.0
-offset_right = 452.0
-offset_bottom = 360.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
-
-[node name="Margin" type="MarginContainer" parent="HUD/Panel"]
-layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 10
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 10
-
-[node name="DebugLabel" type="Label" parent="HUD/Panel/Margin"]
-layout_mode = 2
-text = "initialising"
+[node name="HUD" parent="." instance=ExtResource("12_hud")]

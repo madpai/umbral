@@ -123,6 +123,14 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
 - **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
 
+## 2026-07-26 — Raven's Hollow spatial greybox
+
+- **Status:** accepted **as a spatial prototype only**; establishes no geography, architecture, content or art canon
+- **Context:** With movement, camera, navigation, interaction and consequence all passing, the next question is spatial: does Raven's Hollow feel like a believable frontier settlement players want to explore? A concept image was supplied as inspiration, explicitly non-canon for location, scale, architecture, population and layout.
+- **Decision:** Build `village.tscn` as a primitive-mesh greybox and make it the main scene, keeping `main.tscn` as the unchanged systems lab; both share `main.gd` and a new `ui/debug_hud.tscn`. The stream is a real carved trench and the only crossings are one road bridge on the arrival route and one footbridge serving the mill side. Navmesh `cell_size` moved 0.15 to 0.25 and `agent_radius` 0.45 to 0.5 in both scenes to keep the bake under a second.
+- **Consequences:** Nothing here is canon — not the geography, the building placement, the scale, the architecture or the names. Three deliberate deviations from the concept are recorded in `RAVENS_HOLLOW_LAYOUT_TEST.md`: the settlement is roughly 170 m rather than ~400 m across, the inn sits on the arrival side of the stream, and there are two crossings rather than several. No quests, NPCs, combat, inventory, crafting, dialogue, animation, audio or wildlife were added, and no art or lighting pass was started. Movement, camera, navigation, interaction and the consequence loop were re-measured as identical.
+- **References:** `prototype/RAVENS_HOLLOW_LAYOUT_TEST.md`, `prototype/TUNING.md`, `assets/concepts/Ravens Hollow/`.
+
 ## 2026-07-25 — Temporary one-log causal loop for testing visible consequence
 
 - **Status:** accepted **for this prototype experiment only**; explicitly **not** inventory, gathering, crafting or resource architecture

@@ -37,6 +37,7 @@ godot --path /home/commander/Documents/umbral/prototype
 | WASD | Cancels any interaction and takes manual control |
 | **F5** | Show each object's interaction radius |
 | F4 / F3 / F2 / F1 | Path debug / cameras / control mode / reset |
+| **F7** | Hide/show the debug readout |
 
 Three objects sit near spawn: a **tree** at `(-9, 4)` — the primary test object —
 a **rock** at `(7, -1)` and a **campfire** at `(0, 0)`. The rock and campfire run

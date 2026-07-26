@@ -32,6 +32,7 @@ godot --path /home/commander/Documents/umbral/prototype
 | Hold right mouse | Orbit · Mouse wheel: zoom |
 | F3 / F2 / F1 | Cameras / control mode / reset |
 | WASD | Debug direct control — **cancels the current path** |
+| **F7** | Hide/show the debug readout |
 
 The HUD shows navigation state, remaining path length and waypoint count.
 There is also a `Navigation → Use Navigation` checkbox on the `Player` node:
