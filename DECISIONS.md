@@ -123,6 +123,22 @@ Record consequential technical, process, and repository decisions here. Design d
 - **Consequences:** Phase 2 remains gated on the owner playing the build. Godot's `CharacterBody3D` provides no step-up, and the architecture document excludes step-up solvers, so a 0.20 m step blocks the character; this is recorded in `prototype/TUNING.md` as a known problem for the owner to rule on. All camera values remain unverified because they cannot be evaluated headlessly.
 - **References:** [Implementation Plan](docs/technical/IMPLEMENTATION_PLAN.md), [Prototype Architecture](docs/technical/PROTOTYPE_ARCHITECTURE.md), `prototype/TUNING.md`.
 
+## 2026-07-25 — Interaction prototype passed owner playtest
+
+- **Status:** accepted (verdict); the two recorded observations are **provisional and not canon**
+- **Context:** The interaction prototype asked whether interacting with the world feels satisfying, using one interaction that deliberately produces nothing.
+- **Decision:** Record the owner verdict: the interaction prototype **passes**. The click-object → navigate → enter range → face → interact → complete flow feels good, and the combined prototype makes the owner want to continue playing. No prototype code, timing, tuning or asset was changed as a result.
+- **Consequences:** Two future-facing observations were recorded alongside the verdict. Neither has been applied and neither is a decision. (1) **Production pacing should feel slower, heavier and more deliberate** — but prototype timers must *not* simply be lengthened; pacing is to be evaluated later with animation, sound, anticipation, impact and world response, none of which exist yet. (2) **Intended visual direction is darker, more grounded and less toy-like**, drawing on Ultima Online's environmental readability and world-oriented presentation, and Diablo I's darkness, material age, localised lighting and oppressive mood. This is directional inspiration only: it is **not** a decision to build a literal pixel-art or fixed-isometric clone, does not decide art style, rendering technique, palette or projection, and does **not** override the provisional Hybrid World free-orbit camera. Gathering, inventory and crafting remain unbuilt; the next prototype question is unchosen.
+- **References:** `prototype/INTERACTION_TEST.md`, `prototype/TUNING.md`.
+
+## 2026-07-25 — Temporary prototype interaction approach
+
+- **Status:** accepted **for this prototype experiment only**; not a production interaction system
+- **Context:** With movement, camera, click-to-walk and pathfinding validated, the next prototype question is whether interacting with the world feels satisfying. That needs one interaction, not a system.
+- **Decision:** Objects are `Interactable` (`StaticBody3D` + script) owning their own behaviour and feedback, configured by lightweight `InteractionProfile` resources. The player owns orchestration — hover target, current target, range, state machine (IDLE / MOVING / INTERACTING / COMPLETED) and interruption. `main.gd` only routes the click. No interaction manager, no registry, no global state. The interaction deliberately produces nothing.
+- **Consequences:** Completion itself is what gets evaluated; if the loop is not satisfying without a reward, adding rewards would hide that answer rather than fix it. No inventory, resources, crafting, skills, experience, quests or UI were added. Objects reset a few seconds after completing purely so repeats can be tested — this is not a respawn or resource decision. Movement, camera and navigation were re-measured as identical. Whether interaction needs a reward, whether work should be interruptible, and what a second click should do all remain unresolved.
+- **References:** `prototype/INTERACTION_TEST.md`, `prototype/TUNING.md`.
+
 ## 2026-07-25 — Built-in Godot navigation used for the pathfinding experiment
 
 - **Status:** accepted **for this prototype experiment only**; not a production navigation decision

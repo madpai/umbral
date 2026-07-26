@@ -25,13 +25,41 @@ const REJECT_MATERIAL := preload("res://reject_material.tres")
 var _marker_ok_material: Material
 var _reject_timer := 0.0
 var _nav_ready := false
+var _interactables: Array[Interactable] = []
+var _ranges_shown := false
 
-const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F4: path debug   ·   F3: cameras   ·   F2: control modes   ·   F1: reset"
+
+## The object under the cursor, if any. Cheap enough to run every frame for
+## three objects; a real game would not raycast per frame from the mouse.
+func _hovered_interactable() -> Interactable:
+	if _player.is_mouse_captured():
+		return null
+	var camera := _player.camera
+	var screen := get_viewport().get_mouse_position()
+	var from := camera.project_ray_origin(screen)
+	var query := PhysicsRayQueryParameters3D.create(
+			from, from + camera.project_ray_normal(screen) * CLICK_RANGE)
+	query.exclude = [_player.get_rid()]
+	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	if hit.is_empty():
+		return null
+	return hit.get("collider") as Interactable
+
+
+func _on_interaction_rejected(_target: Interactable) -> void:
+	_set_marker_rejected(true)
+	_marker.global_position = _player.global_position
+	_marker.visible = true
+	_reject_timer = REJECT_FLASH_SECONDS
+
+const CONTROLS_CLICK := "Left click: move   ·   Hold right mouse + drag: orbit   ·   Mouse wheel: zoom\nArrow keys: orbit   ·   F5: ranges   ·   F4: path debug   ·   F3: cameras   ·   F2: modes   ·   F1: reset"
 const CONTROLS_DIRECT := "WASD: move (cancels path)   ·   Mouse: look   ·   Wheel: zoom   ·   Shift: sprint   ·   Space: jump\nF4: path debug   ·   F3: cameras   ·   F2: control modes   ·   F1: reset   ·   Esc: free mouse"
 
 
 func _ready() -> void:
 	_player.destination_requested.connect(_on_destination_requested)
+	_player.interaction_rejected.connect(_on_interaction_rejected)
+	_interactables.assign(get_tree().get_nodes_in_group("interactable"))
 	_marker_ok_material = _marker_disc.get_surface_override_material(0)
 	_bake_navigation.call_deferred()
 
@@ -76,8 +104,17 @@ func _on_destination_requested(screen_position: Vector2) -> void:
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
 	if hit.is_empty():
 		return
+
+	# An object under the cursor takes priority over the ground beneath it.
+	var interactable := hit.get("collider") as Interactable
+	if interactable != null:
+		_player.begin_interaction(interactable)
+		return
+
 	if hit.normal.angle_to(Vector3.UP) > _player.floor_max_angle:
 		return
+	# A plain ground click abandons whatever the character was doing.
+	_player.cancel_interaction()
 	request_destination(hit.position)
 
 
@@ -86,15 +123,7 @@ func _on_destination_requested(screen_position: Vector2) -> void:
 func request_destination(point: Vector3) -> bool:
 	if not _nav_ready:
 		return false
-	var map := get_world_3d().navigation_map
-	var closest := NavigationServer3D.map_get_closest_point(map, point)
-	var on_mesh := closest.distance_to(point) <= NAV_SNAP_TOLERANCE
-	var reachable := on_mesh
-	if on_mesh and _player.use_navigation:
-		var route := NavigationServer3D.map_get_path(
-				map, _player.global_position, closest, true)
-		reachable = route.size() > 0 \
-				and route[route.size() - 1].distance_to(closest) <= NAV_SNAP_TOLERANCE
+	var reachable := _player.is_point_reachable(point)
 
 	_marker.global_position = point
 	_marker.reset_physics_interpolation()
@@ -130,6 +159,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _process(delta: float) -> void:
+	_player.set_hover_target(_hovered_interactable())
+	if _ranges_shown != _player.show_interaction_ranges:
+		_ranges_shown = _player.show_interaction_ranges
+		for item in _interactables:
+			item.show_range(_ranges_shown)
+
 	if _reject_timer > 0.0:
 		_reject_timer -= delta
 		_marker.visible = true
@@ -151,6 +186,8 @@ func _process(delta: float) -> void:
 		path_text = "%5.2f m over %d pts" % [path_length, _player.remaining_path_points()]
 	elif _reject_timer > 0.0:
 		path_text = "UNREACHABLE"
+	var progress := _player.interaction_progress()
+	var progress_text := "" if progress < 0.0 else "  %3.0f%%" % (progress * 100.0)
 	var controls := CONTROLS_CLICK if _player.control_mode == PrototypePlayer.ControlMode.CLICK_TO_MOVE \
 			else CONTROLS_DIRECT
 
@@ -161,6 +198,9 @@ func _process(delta: float) -> void:
 		"fov        %5.1f°" % _player.camera.fov,
 		"mode       %s" % _player.control_mode_name(),
 		"nav        %s" % _player.navigation_state_name(),
+		"interact   %-11s %s%s" % [
+			_player.interaction_state_name(), _player.interaction_target_name(), progress_text],
+		"hover      %s" % _player.hover_target_name(),
 		"path       %s" % path_text,
 		"fps        %5d" % Engine.get_frames_per_second(),
 		"speed      %5.2f m/s" % _player.horizontal_speed(),

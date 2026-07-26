@@ -2,8 +2,9 @@
 
 Phase 1 (movement and camera), Phase 1.1 (jitter correction, step-up,
 click-to-move experiment), Phase 1.2 (camera & perspective laboratory),
-Phase 1.3 (Hybrid World orbit + zoom camera) and Phase 1.4 (navigation
-experiment — see `NAVIGATION_TEST.md`). This file is the actual research output of the
+Phase 1.3 (Hybrid World orbit + zoom camera), Phase 1.4 (navigation experiment
+— see `NAVIGATION_TEST.md`) and Phase 1.5 (interaction experiment — see
+`INTERACTION_TEST.md`). This file is the actual research output of the
 prototype. The code is disposable; these numbers are not.
 
 Phase 1 has been played by the owner and passed provisionally. **Nothing in the
@@ -539,51 +540,117 @@ healthy polygon count while every query returns the origin.
 
 ---
 
+## Phase 1.5 — 2026-07-25 (interaction experiment)
+
+One interaction, three objects, nothing produced. Movement, camera, zoom, orbit
+and navigation are untouched and were re-measured as identical. Disposable; see
+`INTERACTION_TEST.md`.
+
+### Interaction profiles
+
+| Property | Tree | Rock | Campfire |
+| --- | --- | --- | --- |
+| `interaction_range` | 2.6 m | 2.2 m | 2.0 m |
+| `approach_fraction` | 0.70 | 0.70 | 0.65 |
+| `facing_tolerance_degrees` | 20° | 25° | 30° |
+| `duration` | 1.8 s | 1.2 s | 0.9 s |
+| `reset_seconds` | 3.0 | 3.0 | 3.0 |
+| `pulse_speed` / `pulse_amount` | 2.4 / 0.06 | 3.0 / 0.05 | 4.0 / 0.04 |
+
+Player-side: `completed_hold` 0.45 s (holds the COMPLETED state long enough to
+be visible), `show_interaction_ranges` false (F5).
+
+### Two values that are doing real work
+
+- **`approach_fraction` 0.7, not 1.0.** The character aims for a point *inside*
+  interaction range rather than exactly on its edge. Aiming at the edge means any
+  drift re-triggers the approach, and the character shuffles. Measured: it now
+  stops 2.46 m from a tree whose range is 2.6 m.
+- **`facing_tolerance_degrees`.** Progress does not advance until the character
+  is aimed within this angle, which is what produces "arrive → turn → work"
+  without needing a fifth state in the machine. Measured facing error at
+  completion: 0.0°.
+
+### Validation
+
+| Case | Result |
+| --- | --- |
+| Click tree from 16 m | completed in 4.87 s, stopped 2.46 m away, facing 0.0° |
+| Click tree while already walking elsewhere | completed, 4.95 s |
+| Switch to the rock midway | 1 cancel fired, rock completed in 6.13 s |
+| Click campfire from 26 m (outside range) | completed, 6.30 s |
+| Click campfire from 1.2 m (inside range) | completed in 0.97 s, **never walked** |
+| WASD during MOVING | state IDLE, target cleared |
+| WASD during INTERACTING | state IDLE, object back to available |
+| Ground click during INTERACTING | state IDLE, object back to available |
+| Unreachable (stood on the platform) | refused, 1 rejection, state IDLE |
+| After max zoom + 180° orbit | completed, 4.87 s |
+| Three repeats in a row | all completed; later repeats skipped walking correctly |
+| Hover on / off | object reports hovered / available |
+| Hover while working | stays active, hover does not clobber it |
+
+### Non-regression
+
+| Measurement | Phase 1.4 | Phase 1.5 |
+| --- | --- | --- |
+| Walk 0 → 90% | 0.133 s | 0.133 s |
+| Steady sprint | 7.600 m/s | 7.600 m/s |
+| Stop from sprint | 0.100 s / 0.300 m | 0.100 s / 0.300 m |
+| Staircase top | y = 0.601 | y = 0.601 |
+
+---
+
 ## Known problems
 
-1. **The 30° ramp is entered from its side rather than its foot.** Technically
+1. **Interaction has no character animation and no sound.** The pulse is on the
+   object, not the body. Both absences make completion feel flatter than it
+   would in production; judge the timing and flow, not the performance.
+2. **Interaction produces nothing, by design.** No resource, item or number.
+   Whether completion needs a reward to satisfy is the open question, not a
+   defect.
+3. **The 30° ramp is entered from its side rather than its foot.** Technically
    valid, visibly odd; a greybox rasterisation artefact, recorded and
    deliberately not papered over. Full explanation in `NAVIGATION_TEST.md`.
-2. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
+4. **The navmesh is baked at startup (~250 ms) and never rebuilt.** Nothing in
    the scene moves, so this is correct here and wrong for anything dynamic.
-3. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
+5. **Camera presets C and H have obstruction avoidance disabled.** At 9–20 m the
    spring arm punches through terrain constantly and the popping would be blamed
    on the perspective rather than on the arm. The trade is that the camera can
    end up behind tall geometry.
-4. **A click is resolved against the previous frame's camera transform.** Input
+6. **A click is resolved against the previous frame's camera transform.** Input
    is handled before `_process` moves the camera, so a click made during a fast
    zoom or orbit uses a camera pose one frame old. Measured error is 0.0000 m at
    rest, and at 60+ fps this is far below the click's own precision — but it is a
    real ordering detail worth knowing if aiming ever feels off during motion.
-5. **Routing has no dynamic obstacle handling.** The navmesh is static and
+7. **Routing has no dynamic obstacle handling.** The navmesh is static and
    `avoidance_enabled` is off. Correct for one player in a fixed greybox; wrong
    for anything that moves. Straight-line steering is still available via the
    `Use Navigation` checkbox as the A/B comparison.
-6. **Step-up rejects a step that has a wall close behind it.** The clearance test
+8. **Step-up rejects a step that has a wall close behind it.** The clearance test
    probes forward by the capsule radius (0.45 m), so a 0.20 m step with an
    obstruction within ~0.45 m beyond it reads as a wall and will not be climbed.
    Acceptable for a greybox; would need the probe split into two tests if it ever
    mattered.
-7. **Step-up is not swept.** It is evaluated once per physics frame against the
+9. **Step-up is not swept.** It is evaluated once per physics frame against the
    frame's motion, so at very high speed against a step the character could in
    principle tunnel. Not observed at sprint speed (7.6 m/s = 0.127 m per frame).
-8. **Every camera value remains a judgement, not a measurement.** Distances,
+10. **Every camera value remains a judgement, not a measurement.** Distances,
    pitches, lenses, damping and the zoom curve across all four presets were
    chosen from convention and then checked for geometry, not for how they look.
    That is precisely what `CAMERA_TEST.md` exists to resolve.
-9. **No gamepad has been exercised.** Bindings exist for both sticks,
+11. **No gamepad has been exercised.** Bindings exist for both sticks,
    `A`/cross, left-stick-click, Start, Select and right shoulder, but no
    controller was connected, so deadzones and look speed are unverified. There is
    no gamepad binding for zoom.
-10. **Frame rate is unmeasured under load.** Only headless runs were performed.
+12. **Frame rate is unmeasured under load.** Only headless runs were performed.
    Presets C and H draw considerably more of the scene than A; these are the
    first presets where framerate could plausibly differ.
-11. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
+13. **The 50° ramp is a dead end by design.** It is above `floor_max_angle` so the
    character slides off. That is the intended demonstration, not a bug.
-12. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
+14. **Air control may be too weak or too strong.** `air_acceleration` 14.0 and
     `air_deceleration` 3.0 preserve most momentum through a jump. Untested by
     hand.
-13. **Sprint and jump may not belong in this control model at all.** Owner
+15. **Sprint and jump may not belong in this control model at all.** Owner
     observations recorded in `CAMERA_TEST.md`; nothing changed in the build.
 
 ---

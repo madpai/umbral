@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="InteractionProfile" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://interaction/interaction_profile.gd" id="1_p"]
+
+[resource]
+script = ExtResource("1_p")
+display_name = "Campfire"
+interaction_range = 2.0
+approach_fraction = 0.65
+facing_tolerance_degrees = 30.0
+duration = 0.9
+reset_seconds = 3.0
+tint_strength = 0.55
+pulse_speed = 4.0
+pulse_amount = 0.04

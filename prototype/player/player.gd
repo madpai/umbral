@@ -23,11 +23,20 @@ extends CharacterBody3D
 
 enum MoveState { GROUNDED, AIRBORNE }
 enum ControlMode { DIRECT, CLICK_TO_MOVE }
+## The player owns interaction orchestration; objects own their own behaviour.
+enum InteractState { IDLE, MOVING, INTERACTING, COMPLETED }
 
 ## Emitted when the player asks to travel somewhere. Carries a SCREEN position;
 ## main.gd owns the world and does the raycast. Signals go up, nothing reaches
 ## down.
 signal destination_requested(screen_position: Vector2)
+
+## Raised so main.gd can drive world-space feedback. The player never reaches
+## into the scene to do it itself.
+signal interaction_started(target: Interactable)
+signal interaction_completed(target: Interactable)
+signal interaction_cancelled(target: Interactable)
+signal interaction_rejected(target: Interactable)
 
 @export_group("Control Mode")
 ## Defaults to the mode under test. F2 toggles at runtime.
@@ -77,6 +86,13 @@ signal destination_requested(screen_position: Vector2)
 ## Tallest vertical lip the character will walk up. Set to 0 to disable.
 ## Anything taller is treated as a wall. See _try_step_up().
 @export_range(0.0, 0.8, 0.01) var max_step_height := 0.25
+
+@export_group("Interaction")
+## Held after completing before returning to idle, so the COMPLETED state is
+## visible on the debug readout rather than flashing past.
+@export_range(0.0, 3.0, 0.05) var completed_hold := 0.45
+## Draws each object's interaction radius on the ground. Toggled with F5.
+@export var show_interaction_ranges := false
 
 @export_group("Navigation")
 ## Off = the Phase 1.1 straight-line steering, kept so routing can be compared
@@ -152,6 +168,12 @@ var _stuck_time := 0.0
 ## Set when a destination is abandoned because the character stopped making
 ## progress. Debug readout only.
 var _gave_up := false
+var interact_state: InteractState = InteractState.IDLE
+var _interact_target: Interactable = null
+var _hover_target: Interactable = null
+var _interact_elapsed := 0.0
+var _completed_hold_left := 0.0
+var _facing_ok := false
 
 
 func _ready() -> void:
@@ -180,6 +202,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		var preset := active_preset()
 		_pitch = clampf(_pitch,
 				deg_to_rad(preset.pitch_min_degrees), deg_to_rad(preset.pitch_max_degrees))
+	elif event.is_action_pressed("toggle_range_debug"):
+		show_interaction_ranges = not show_interaction_ranges
 	elif event.is_action_pressed("cycle_camera"):
 		cycle_camera_preset(1)
 	elif event.is_action_pressed("toggle_control_mode"):
@@ -316,6 +340,7 @@ func _physics_process(delta: float) -> void:
 
 	_update_slope()
 	_update_stuck(delta)
+	_update_interaction(delta)
 	_update_stuck(delta)
 
 
@@ -330,11 +355,16 @@ func _movement_direction() -> Vector3:
 	if input.length_squared() > 0.0:
 		# WASD always wins, in either mode. In CLICK_TO_MOVE this is the escape
 		# hatch that stops the build ever being unrecoverable; it is not the
-		# behaviour under test.
+		# behaviour under test. Manual movement also abandons any interaction.
 		_has_destination = false
+		if interact_state != InteractState.IDLE:
+			cancel_interaction()
 		return _camera_relative(input)
 
 	if control_mode == ControlMode.DIRECT:
+		return Vector3.ZERO
+
+	if interact_state == InteractState.INTERACTING:
 		return Vector3.ZERO
 
 	if not _has_destination:
@@ -506,6 +536,163 @@ func _update_zoom(delta: float) -> void:
 	_zoom_baseline_pitch = baseline
 
 
+# ------------------------------------------------------------ interaction ----
+
+## Entry point for a click on an object. Cancels whatever was happening, walks
+## into range if needed, and hands the object back its own begin/progress calls.
+func begin_interaction(target: Interactable) -> bool:
+	if target == null:
+		return false
+	if not target.is_available():
+		interaction_rejected.emit(target)
+		return false
+
+	cancel_interaction()
+	_interact_target = target
+	_interact_elapsed = 0.0
+	_facing_ok = false
+
+	if _within_interaction_range(target):
+		# Already close enough: skip the walk entirely, just turn and work.
+		clear_destination()
+		interact_state = InteractState.INTERACTING
+		target.begin_interaction()
+		interaction_started.emit(target)
+		return true
+
+	var approach := target.approach_point_from(global_position)
+	if not is_point_reachable(approach):
+		_interact_target = null
+		interaction_rejected.emit(target)
+		return false
+
+	set_destination(approach)
+	interact_state = InteractState.MOVING
+	interaction_started.emit(target)
+	return true
+
+
+func cancel_interaction() -> void:
+	if _interact_target == null:
+		interact_state = InteractState.IDLE
+		return
+	var target := _interact_target
+	_interact_target = null
+	_interact_elapsed = 0.0
+	interact_state = InteractState.IDLE
+	target.cancel_interaction()
+	interaction_cancelled.emit(target)
+
+
+func set_hover_target(target: Interactable) -> void:
+	if target == _hover_target:
+		return
+	if _hover_target != null:
+		_hover_target.set_hovered(false)
+	_hover_target = target
+	if _hover_target != null:
+		_hover_target.set_hovered(true)
+
+
+func _update_interaction(delta: float) -> void:
+	match interact_state:
+		InteractState.MOVING:
+			if _interact_target == null or not _interact_target.is_available():
+				cancel_interaction()
+			elif _within_interaction_range(_interact_target):
+				# Arrived. Stop steering and let ordinary deceleration settle it
+				# while the character turns to face the object.
+				clear_destination()
+				interact_state = InteractState.INTERACTING
+				_interact_elapsed = 0.0
+				_facing_ok = false
+				_interact_target.begin_interaction()
+			elif not _has_destination:
+				# Movement ended without arriving: blocked, or gave up.
+				cancel_interaction()
+
+		InteractState.INTERACTING:
+			if _interact_target == null or not _interact_target.is_available():
+				cancel_interaction()
+				return
+			_face_target(_interact_target, delta)
+			if not _facing_ok:
+				return
+			_interact_elapsed += delta
+			var duration: float = maxf(_interact_target.profile.duration, 0.01)
+			var t := _interact_elapsed / duration
+			_interact_target.set_progress(t)
+			if t >= 1.0:
+				var finished := _interact_target
+				_interact_target = null
+				interact_state = InteractState.COMPLETED
+				_completed_hold_left = completed_hold
+				finished.complete_interaction()
+				interaction_completed.emit(finished)
+
+		InteractState.COMPLETED:
+			_completed_hold_left -= delta
+			if _completed_hold_left <= 0.0:
+				interact_state = InteractState.IDLE
+
+
+## Turns the body toward the object using the same smoothing as movement, and
+## reports whether it is aimed closely enough for work to begin.
+func _face_target(target: Interactable, delta: float) -> void:
+	var to_target := target.global_position - global_position
+	to_target.y = 0.0
+	if to_target.length_squared() < 0.0001:
+		_facing_ok = true
+		return
+	var wanted := atan2(-to_target.x, -to_target.z)
+	var weight := 1.0 - exp(-turn_smoothing * delta)
+	body.rotation.y = lerp_angle(body.rotation.y, wanted, weight)
+	var tolerance := deg_to_rad(target.profile.facing_tolerance_degrees)
+	_facing_ok = absf(angle_difference(body.rotation.y, wanted)) <= tolerance
+
+
+func _within_interaction_range(target: Interactable) -> bool:
+	var flat := target.global_position - global_position
+	flat.y = 0.0
+	return flat.length() <= target.interaction_range()
+
+
+## Shared with main.gd so the reachability rule lives in exactly one place.
+func is_point_reachable(point: Vector3) -> bool:
+	if not use_navigation:
+		return true
+	var map := get_world_3d().navigation_map
+	var closest := NavigationServer3D.map_get_closest_point(map, point)
+	if closest.distance_to(point) > 1.0:
+		return false
+	var route := NavigationServer3D.map_get_path(map, global_position, closest, true)
+	return route.size() > 0 and route[route.size() - 1].distance_to(closest) <= 1.0
+
+
+func interaction_state_name() -> String:
+	match interact_state:
+		InteractState.MOVING: return "MOVING"
+		InteractState.INTERACTING: return "INTERACTING" if _facing_ok else "TURNING"
+		InteractState.COMPLETED: return "COMPLETED"
+		_: return "IDLE"
+
+
+func interaction_target_name() -> String:
+	if _interact_target == null:
+		return "—"
+	return _interact_target.profile.display_name
+
+
+func interaction_progress() -> float:
+	if _interact_target == null or interact_state != InteractState.INTERACTING:
+		return -1.0
+	return clampf(_interact_elapsed / maxf(_interact_target.profile.duration, 0.01), 0.0, 1.0)
+
+
+func hover_target_name() -> String:
+	return "—" if _hover_target == null else _hover_target.profile.display_name
+
+
 ## Abandons a destination the character has stopped making progress toward, so
 ## it can never stand pressing into an obstacle indefinitely.
 func _update_stuck(delta: float) -> void:
@@ -617,6 +804,7 @@ func _reset_to_spawn() -> void:
 	_jump_buffer = 0.0
 	_slope_degrees = 0.0
 	_has_destination = false
+	cancel_interaction()
 	_apply_camera_preset()
 
 

@@ -1,9 +1,13 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=48 format=3]
 
 [ext_resource type="Script" path="res://main.gd" id="1_main"]
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://camera/camera_preset.gd" id="3_cpscript"]
 [ext_resource type="Resource" path="res://camera/presets/h_hybrid_world.tres" id="7_cam_h"]
+[ext_resource type="Script" path="res://interaction/interactable.gd" id="8_inter"]
+[ext_resource type="Resource" path="res://interaction/profiles_tree.tres" id="9_p_tree"]
+[ext_resource type="Resource" path="res://interaction/profiles_rock.tres" id="10_p_rock"]
+[ext_resource type="Resource" path="res://interaction/profiles_campfire.tres" id="11_p_fire"]
 [ext_resource type="Resource" path="res://camera/presets/a_classic_third_person.tres" id="4_cam_a"]
 [ext_resource type="Resource" path="res://camera/presets/b_adventure.tres" id="5_cam_b"]
 [ext_resource type="Resource" path="res://camera/presets/c_high_strategy.tres" id="6_cam_c"]
@@ -83,6 +87,77 @@ detail_sample_max_error = 1.0
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker_bad"]
 shading_mode = 0
 albedo_color = Color(0.95, 0.22, 0.18, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_trunk"]
+top_radius = 0.28
+bottom_radius = 0.38
+height = 3.2
+
+[sub_resource type="StandardMaterial3D" id="Mat_bark"]
+albedo_color = Color(0.36, 0.27, 0.19, 1)
+roughness = 1.0
+
+[sub_resource type="SphereMesh" id="SphereMesh_canopy"]
+radius = 1.35
+height = 2.4
+
+[sub_resource type="StandardMaterial3D" id="Mat_leaf"]
+albedo_color = Color(0.27, 0.45, 0.24, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderShape3D" id="Shape_trunk"]
+height = 3.2
+radius = 0.4
+
+[sub_resource type="SphereMesh" id="SphereMesh_rock"]
+radius = 0.75
+height = 1.1
+
+[sub_resource type="StandardMaterial3D" id="Mat_rock"]
+albedo_color = Color(0.46, 0.47, 0.5, 1)
+roughness = 0.95
+
+[sub_resource type="SphereShape3D" id="Shape_rock"]
+radius = 0.72
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_fire"]
+top_radius = 0.55
+bottom_radius = 0.7
+height = 0.3
+
+[sub_resource type="StandardMaterial3D" id="Mat_stone"]
+albedo_color = Color(0.38, 0.36, 0.34, 1)
+roughness = 1.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_flame"]
+top_radius = 0.0
+bottom_radius = 0.32
+height = 0.75
+
+[sub_resource type="StandardMaterial3D" id="Mat_flame"]
+albedo_color = Color(0.9, 0.5, 0.16, 1)
+roughness = 0.6
+
+[sub_resource type="CylinderShape3D" id="Shape_fire"]
+height = 0.4
+radius = 0.7
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ring"]
+top_radius = 0.9
+bottom_radius = 0.9
+height = 0.02
+radial_segments = 28
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="Mat_progress"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.82, 0.3, 0.75)
+
+[sub_resource type="StandardMaterial3D" id="Mat_range"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(0.45, 0.75, 1, 0.16)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.0509804, 0.0588235, 0.0705882, 0.72)
@@ -196,6 +271,96 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 1.5, 12.5)
 use_collision = true
 size = Vector3(0.8, 3, 11.8)
 material = SubResource("StandardMaterial3D_pillar")
+
+[node name="Interactables" type="Node3D" parent="NavRegion"]
+
+[node name="Tree" type="StaticBody3D" parent="NavRegion/Interactables" groups=["interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 4)
+script = ExtResource("8_inter")
+profile = ExtResource("9_p_tree")
+
+[node name="Shape" type="CollisionShape3D" parent="NavRegion/Interactables/Tree"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+shape = SubResource("Shape_trunk")
+
+[node name="Visual" type="Node3D" parent="NavRegion/Interactables/Tree"]
+
+[node name="Trunk" type="MeshInstance3D" parent="NavRegion/Interactables/Tree/Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+mesh = SubResource("CylinderMesh_trunk")
+surface_material_override/0 = SubResource("Mat_bark")
+
+[node name="Canopy" type="MeshInstance3D" parent="NavRegion/Interactables/Tree/Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.05, 0)
+mesh = SubResource("SphereMesh_canopy")
+surface_material_override/0 = SubResource("Mat_leaf")
+
+[node name="ProgressRing" type="MeshInstance3D" parent="NavRegion/Interactables/Tree"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_progress")
+
+[node name="RangeRing" type="MeshInstance3D" parent="NavRegion/Interactables/Tree"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_range")
+
+[node name="Rock" type="StaticBody3D" parent="NavRegion/Interactables" groups=["interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, -1)
+script = ExtResource("8_inter")
+profile = ExtResource("10_p_rock")
+
+[node name="Shape" type="CollisionShape3D" parent="NavRegion/Interactables/Rock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
+shape = SubResource("Shape_rock")
+
+[node name="Visual" type="Node3D" parent="NavRegion/Interactables/Rock"]
+
+[node name="Body" type="MeshInstance3D" parent="NavRegion/Interactables/Rock/Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+mesh = SubResource("SphereMesh_rock")
+surface_material_override/0 = SubResource("Mat_rock")
+
+[node name="ProgressRing" type="MeshInstance3D" parent="NavRegion/Interactables/Rock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_progress")
+
+[node name="RangeRing" type="MeshInstance3D" parent="NavRegion/Interactables/Rock"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_range")
+
+[node name="Campfire" type="StaticBody3D" parent="NavRegion/Interactables" groups=["interactable"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("8_inter")
+profile = ExtResource("11_p_fire")
+
+[node name="Shape" type="CollisionShape3D" parent="NavRegion/Interactables/Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+shape = SubResource("Shape_fire")
+
+[node name="Visual" type="Node3D" parent="NavRegion/Interactables/Campfire"]
+
+[node name="Stones" type="MeshInstance3D" parent="NavRegion/Interactables/Campfire/Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.15, 0)
+mesh = SubResource("CylinderMesh_fire")
+surface_material_override/0 = SubResource("Mat_stone")
+
+[node name="Flame" type="MeshInstance3D" parent="NavRegion/Interactables/Campfire/Visual"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.62, 0)
+mesh = SubResource("CylinderMesh_flame")
+surface_material_override/0 = SubResource("Mat_flame")
+
+[node name="ProgressRing" type="MeshInstance3D" parent="NavRegion/Interactables/Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_progress")
+
+[node name="RangeRing" type="MeshInstance3D" parent="NavRegion/Interactables/Campfire"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.03, 0)
+mesh = SubResource("CylinderMesh_ring")
+surface_material_override/0 = SubResource("Mat_range")
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 8)
